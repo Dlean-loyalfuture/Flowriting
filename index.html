@@ -1,0 +1,2529 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WriteFlow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Shantell+Sans:wght@400;500&family=Atma:wght@400;500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Noto+Serif+Bengali:wght@400;600&family=LXGW+WenKai+TC&display=swap">
+<style>
+/* Layout: the page changes material as the writing matures — pencil sketch on ivory (draft), structured notes (shape), APA 7 student paper on white (final). Controls stay in one legible sans throughout. */
+:root{
+  --paper:#F7F5EF; --page:#FFFFFF; --card:#FFFFFF; --sunk:#EFECE3;
+  --ink:#2B2A26; --ink-final:#1A1A1A; --muted:#5F6B78; --pencil:#4A5560; --line:#D6D3CA; --rule:#1A1A1A;
+  --navy:#1F3A5F; --navy-ink:#FFFFFF; --navy-soft:#DCE4EE;
+  --bubble:#E8EEF5; --bubble-line:#8FA3BA; --write-line:#B8C4D2;
+  --hl:#FBE38A; --hl-line:#E3C24F; --spark:#F2C94C; --spark-line:#D9A21B;
+  --zone-unsure:#EFEBDF; --zone-archive:#E7E3D6; --grid-dot:#DDD8CB;
+  --rec:#9C3B2E; --ok:#3F6B3A; --shadow:rgba(40,40,30,.12); --toast-bg:#1F3A5F; --toast-ink:#FFFFFF;
+  --s0:#3E6690; --s1:#2F7A74; --s2:#A0661E; --s3:#74508F; --s4:#56782F; --s5:#9C4A35;
+  --f-ui:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-draft:"Shantell Sans","Atma","LXGW WenKai TC","Comic Neue",system-ui,sans-serif;
+  --f-shape:"Source Serif 4","Noto Serif Bengali","LXGW WenKai TC",Georgia,serif;
+  --f-final:"Times New Roman",Times,"Liberation Serif","Noto Serif Bengali",serif;
+  --f-brand:"Source Serif 4",Georgia,serif;
+  --f-mono:ui-monospace,Menlo,Consolas,monospace;
+  --wob:255px 12px 225px 12px/12px 225px 12px 255px;
+  --wob-lg:22px 8px 18px 10px/10px 18px 8px 22px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1C1D1A; --page:#161715; --card:#24262A; --sunk:#2A2C2E;
+    --ink:#E9E6DC; --ink-final:#F0EEE8; --muted:#A6AEB8; --pencil:#9AA4AE; --line:#3B3D3F; --rule:#C9C6BE;
+    --navy:#A9C1E0; --navy-ink:#13171D; --navy-soft:#2A3442;
+    --bubble:#232C38; --bubble-line:#5B6F87; --write-line:#4A5868;
+    --hl:#6E5B17; --hl-line:#A88A2A; --spark:#E8C04A; --spark-line:#C79A1E;
+    --zone-unsure:#23241F; --zone-archive:#1F201C; --grid-dot:#34352F;
+    --rec:#D98C74; --ok:#8BC28A; --shadow:rgba(0,0,0,.45); --toast-bg:#A9C1E0; --toast-ink:#13171D;
+    --s0:#86A9D3; --s1:#6BBFB7; --s2:#D9A85C; --s3:#B79AD3; --s4:#9DC57E; --s5:#DC9278;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1C1D1A; --page:#161715; --card:#24262A; --sunk:#2A2C2E;
+  --ink:#E9E6DC; --ink-final:#F0EEE8; --muted:#A6AEB8; --pencil:#9AA4AE; --line:#3B3D3F; --rule:#C9C6BE;
+  --navy:#A9C1E0; --navy-ink:#13171D; --navy-soft:#2A3442;
+  --bubble:#232C38; --bubble-line:#5B6F87; --write-line:#4A5868;
+  --hl:#6E5B17; --hl-line:#A88A2A; --spark:#E8C04A; --spark-line:#C79A1E;
+  --zone-unsure:#23241F; --zone-archive:#1F201C; --grid-dot:#34352F;
+  --rec:#D98C74; --ok:#8BC28A; --shadow:rgba(0,0,0,.45); --toast-bg:#A9C1E0; --toast-ink:#13171D;
+  --s0:#86A9D3; --s1:#6BBFB7; --s2:#D9A85C; --s3:#B79AD3; --s4:#9DC57E; --s5:#DC9278;
+  color-scheme:dark;
+}
+
+/* Phase tokens */
+body{--bg:var(--paper);--f-content:var(--f-draft);--box:var(--card);--box-border:1.5px solid var(--pencil);--box-r:var(--wob);--panel-r:var(--wob-lg);--content-ink:var(--ink)}
+body[data-phase="shape"]{--f-content:var(--f-shape);--box-border:1px solid var(--line);--box-r:4px;--panel-r:4px}
+body[data-phase="final"]{--bg:var(--page);--f-content:var(--f-final);--box-border:1px solid var(--line);--box-r:0px;--panel-r:2px;--content-ink:var(--ink-final)}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.55;transition:background-color .7s ease;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+.app{max-width:1100px;margin:0 auto;padding-block:16px 110px}
+body.wide .app{max-width:1840px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.s0{--src:var(--s0)}.s1{--src:var(--s1)}.s2{--src:var(--s2)}.s3{--src:var(--s3)}.s4{--src:var(--s4)}.s5{--src:var(--s5)}
+.morphable{transition:border-radius .55s ease,border-color .55s ease,background-color .6s ease,border-width .55s ease}
+
+/* Highlighter: a real stroke in draft, a thin underline in shape, gone in final */
+.hl{background-image:linear-gradient(var(--hl),var(--hl));background-repeat:no-repeat;background-position:0 88%;background-size:100% 52%;padding:0 .12em;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size .55s ease}
+body[data-phase="shape"] .hl{background-image:linear-gradient(var(--hl-line),var(--hl-line));background-size:100% 2px;background-position:0 96%}
+body[data-phase="final"] .hl{background-size:0 2px;padding:0}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:8px 14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.wordmark{font-family:var(--f-brand);font-style:italic;font-weight:600;font-size:1.5rem;color:var(--navy);letter-spacing:.005em}
+.sub{color:var(--muted);font-size:.85rem}
+#rail{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+.rail-done{font-size:.78rem;color:var(--muted);padding:3px 10px;border-radius:999px;background:var(--sunk)}
+.rail-done::before{content:"✓ ";color:var(--ok);font-weight:700}
+.rail-now{font-size:.78rem;font-weight:700;color:var(--navy-ink);background:var(--navy);padding:3px 10px;border-radius:999px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Buttons (UI font, every phase) */
+.primary,.secondary,.ghost-btn,.icon-btn{font-family:var(--f-ui)}
+.primary{background:var(--navy);color:var(--navy-ink);border:1.5px solid var(--navy);border-radius:var(--box-r);padding:10px 20px;font-weight:700}
+.primary:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:var(--box-r);padding:9px 16px;font-weight:700}
+.secondary:disabled{opacity:.45;cursor:not-allowed}
+.ghost-btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:.9rem;cursor:pointer}
+.ghost-btn[aria-pressed="true"]{border-color:var(--navy);color:var(--navy);background:var(--navy-soft)}
+.ghost-btn:disabled{opacity:.45;cursor:not-allowed}
+.link-btn{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.85rem;padding:0;justify-self:start;font-family:var(--f-ui)}
+.icon-btn{min-width:34px;height:34px;border:1px solid var(--line);background:var(--card);border-radius:8px;color:var(--ink);font-size:1rem}
+.icon-btn:disabled{opacity:.35;cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+
+/* Stage frame */
+#main{transition:opacity .22s ease,transform .22s ease}
+#main.morph-fade{opacity:0;transform:translateY(-4px)}
+#main.morph-in{animation:morphIn .45s ease both}
+@keyframes morphIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.stage{display:grid;gap:22px;padding-top:28px}
+.stage-head{max-width:70ch}
+.eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--muted);margin:0 0 6px}
+h1{font-family:var(--f-content);font-weight:500;font-size:clamp(1.6rem,3vw,2.15rem);line-height:1.2;margin:0 0 8px;color:var(--content-ink);text-wrap:balance}
+body[data-phase="shape"] h1{font-style:italic;font-weight:400;color:var(--navy);border-left:3px solid var(--navy);padding-left:12px}
+body[data-phase="final"] h1{font-weight:700;font-size:clamp(1.4rem,2.4vw,1.75rem)}
+.lede{margin:0;color:var(--muted);max-width:68ch}
+.panel{background:var(--box);border:var(--box-border);border-radius:var(--panel-r);padding:20px;display:grid;gap:12px;min-width:0}
+.current{transition:transform .26s ease,opacity .26s ease}
+body[data-phase="shape"] .current{border-left:3px solid var(--navy);border-radius:0 4px 4px 0}
+.current.folding{transform:translateX(-22px) scale(.985);opacity:0}
+.field-label{font-weight:700;font-size:.9rem;font-family:var(--f-ui)}
+textarea,input[type="text"],select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
+select{font-family:var(--f-ui)}
+textarea,input[type="text"].content{font-family:var(--f-content);font-size:1.02rem;color:var(--content-ink)}
+body[data-phase="draft"] textarea{border:1.5px solid var(--pencil);border-radius:var(--wob-lg)}
+body[data-phase="shape"] textarea{background:transparent;border:0;border-bottom:1.5px dashed var(--write-line);border-radius:0;padding:8px 2px;
+  background-image:repeating-linear-gradient(transparent 0 calc(1.6em - 1px),var(--line) calc(1.6em - 1px) 1.6em);background-position:0 8px;line-height:1.6}
+body[data-phase="final"] textarea{border-radius:0;border-color:var(--line);line-height:2}
+textarea{resize:vertical;line-height:1.55}
+textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85;font-style:italic}
+input[type="checkbox"]{accent-color:var(--navy);width:18px;height:18px;margin-top:2px;flex:none}
+.example-flag{margin:0;font-size:.85rem;color:var(--muted);background:var(--sunk);padding:6px 10px;border-radius:8px;justify-self:start}
+.example-flag b{color:var(--ink)}
+.reminder{margin:0;padding:10px 12px;background:var(--sunk);border-radius:8px;max-width:76ch;font-family:var(--f-content)}
+.mini{display:block;font-family:var(--f-ui);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px}
+.count{margin:0;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.note{margin:0;font-size:.85rem;color:var(--muted)}
+
+/* Source chips */
+.src-chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.src-chip{font-family:var(--f-ui);font-size:.8rem;background:var(--sunk);border-radius:999px;padding:2px 10px 2px 8px;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.src-chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--src)}
+.cite-inline{display:none}
+
+/* Source map: a big board with zoom */
+.map-grid{display:grid;gap:12px}
+.map-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px 28px;align-items:end}
+.map-intro{display:grid;gap:14px;min-width:0}
+@media (max-width:900px){.map-top{grid-template-columns:1fr}}
+.map-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.zoom{display:flex;gap:6px;align-items:center}
+.zoom output{min-width:3.6em;text-align:center;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.board-wrap{overflow:auto;border:1.5px solid var(--pencil);border-radius:var(--wob-lg);background:var(--paper);width:100%;height:max(540px,calc(100vh - 150px));overscroll-behavior:contain}
+.board-sizer{position:relative}
+.board{position:absolute;left:0;top:0;transform-origin:0 0;background-color:var(--paper);background-image:radial-gradient(var(--grid-dot) 1.2px,transparent 1.2px);background-size:26px 26px}
+.zone{position:absolute;pointer-events:none}
+.zone.unsure{background:var(--zone-unsure);border-left:1.5px dashed var(--pencil)}
+.zone.archive{background:var(--zone-archive);border-top:1.5px dashed var(--pencil)}
+.zone-label{position:absolute;top:10px;left:14px;font-family:var(--f-ui);font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.hull{position:absolute;border:1.5px dashed var(--navy);border-radius:var(--wob-lg);background:transparent;pointer-events:none;z-index:1}
+.hints{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
+.hints line{stroke:var(--navy);stroke-width:1.2;stroke-dasharray:2 6;opacity:.6}
+.hints text{fill:var(--muted);font-size:12px;font-family:var(--f-ui)}
+.item{position:absolute;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;z-index:2}
+.item.dragging{z-index:20;cursor:grabbing;transform:rotate(-1.5deg) scale(1.03);filter:drop-shadow(0 8px 14px var(--shadow))}
+.item.in-archive{opacity:.55}
+.card{width:208px;background:var(--card);border:1.5px solid var(--pencil);border-radius:var(--wob);padding:9px 28px 11px 12px;transition:transform .2s ease,border-color .2s ease}
+.card .src{font-family:var(--f-ui);font-size:.76rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.card .src::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--src);flex:none}
+.ctext{margin:4px 0 0;font-family:var(--f-draft);font-size:.86rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:var(--ink)}
+.ctext .hl{background-size:100% 42%}
+.card.mentioned{transform:scale(1.03)}
+.card.near,.stack.near .bubble{border-color:var(--navy);border-style:dashed}
+.card.near{transform:scale(1.01)}
+.mini-btn{position:absolute;top:4px;right:4px;border:0;background:none;color:var(--muted);font-size:.85rem;padding:2px 5px;border-radius:4px;line-height:1.2;font-family:var(--f-ui)}
+.mini-btn:hover{background:var(--sunk);color:var(--ink)}
+.stack{width:236px}
+.bubble{position:relative;background:var(--bubble);color:var(--navy);border:1.5px solid var(--bubble-line);border-radius:var(--wob);padding:9px 13px;margin-bottom:8px;transition:border-color .2s ease}
+.btext{margin:0;font-family:var(--f-draft);font-size:.95rem;line-height:1.45;padding-right:44px;overflow-wrap:anywhere;min-height:1.3em}
+.btext u{text-decoration:none;border-bottom:1.8px solid var(--navy)}
+.btext[contenteditable="true"]{outline:2px solid var(--navy);outline-offset:2px;background:var(--card);cursor:text;user-select:text;-webkit-user-select:text;border-radius:4px}
+.b-tools{position:absolute;top:4px;right:6px;display:flex;gap:2px}
+.b-tools .mini-btn{position:static}
+.under{list-style:none;margin:0;padding:0 0 0 14px;display:grid;gap:4px}
+.chip-card{background:var(--card);border:1px solid var(--pencil);border-radius:var(--wob);padding:3px 10px;font-family:var(--f-draft);font-size:.76rem;line-height:1.35;cursor:grab;touch-action:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:flex;gap:6px;align-items:center}
+.chip-card::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--src);flex:none}
+.chip-card b{font-weight:400;font-family:var(--f-ui);color:var(--muted)}
+.chip-card.mentioned{border-color:var(--navy);border-width:1.8px}
+.map-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.talk{display:grid;gap:8px}
+.talk-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.board-hint{margin:0;font-size:.84rem;color:var(--muted)}
+
+/* Feedback 1: a new bubble pops and sparkles */
+.bubble.pop{animation:bubPop 1.1s ease-out}
+@keyframes bubPop{0%{transform:scale(.85);opacity:0}18%{transform:scale(1.08);opacity:1;border-color:var(--spark-line)}40%{transform:scale(1)}100%{border-color:var(--bubble-line)}}
+.bubble.pop-quiet{animation:bubQuiet .35s ease-out}
+@keyframes bubQuiet{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.halo{position:absolute;inset:-2px;border:1.5px dashed var(--spark);border-radius:var(--wob);animation:halo .8s ease-out forwards;pointer-events:none}
+@keyframes halo{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.18,1.6);opacity:0}}
+.sp{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;pointer-events:none;opacity:0;animation:burst .9s ease-out forwards}
+.sp svg{display:block}
+.sp path{fill:var(--spark);stroke:var(--spark-line);stroke-width:.5}
+@keyframes burst{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:0}25%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(var(--s,1)) rotate(25deg);opacity:0}}
+
+/* Feedback 2: a named card gets a pencil loop */
+.loop{position:absolute;overflow:visible;pointer-events:none;z-index:3}
+.loop path{fill:none;stroke:var(--navy);stroke-width:1.8;stroke-linecap:round;stroke-dasharray:var(--L);stroke-dashoffset:var(--L);animation:draw .55s ease-in-out forwards;animation-delay:var(--d,0ms)}
+.loop.static path{animation:none;stroke-dashoffset:0}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* Feedback 3: a gentle snap when a stack forms */
+.bubble.clack{animation:clack .25s ease-out}
+@keyframes clack{0%{transform:scale(1.01)}40%{transform:scale(.99) translateY(1px)}100%{transform:none}}
+.chip-card.snapped{animation:snap .3s cubic-bezier(.3,1.25,.5,1)}
+@keyframes snap{0%{transform:translateY(-5px) scale(1.04)}65%{transform:translateY(.5px) scale(.99)}100%{transform:none}}
+
+/* Writing stroke on primary buttons (draft and shape phases) */
+.primary{position:relative}
+.scribble{position:absolute;left:9%;bottom:4px;width:82%;height:10px;overflow:visible;pointer-events:none}
+.scribble path{fill:none;stroke:var(--hl);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--L);stroke-dashoffset:var(--L);animation:draw .34s ease-out forwards}
+
+/* Filing cabinet: finished paragraphs are filed as folders; the drawer stays open a crack so their tabs show. */
+.filing{position:relative;z-index:2;pointer-events:none;will-change:transform,opacity}
+.cabinet{position:relative;width:100%;max-width:260px;padding-top:34px}
+.drawer{position:relative;z-index:0;height:34px;margin:0 10px;overflow:hidden;background:var(--sunk);border:1px solid var(--pencil);border-bottom:0;display:flex;align-items:flex-start;gap:3px;padding:10px 8px 0;transition:height .22s ease}
+.cabinet.open .drawer,.peeking .drawer{height:66px}
+.ftab{position:relative;flex:1 1 0;min-width:0;height:56px;background:var(--card);border:1px solid var(--bubble-line);border-bottom:0;border-radius:4px 4px 0 0;padding:3px 6px;font-family:var(--f-shape);font-style:italic;font-size:.74rem;color:var(--navy)}
+.ftab span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ftab.s2::before,.ftab.s3::before,.ftab.s3::after{content:"";position:absolute;left:3px;right:-3px;top:-4px;height:12px;border:1px solid var(--line);border-bottom:0;border-radius:4px 4px 0 0;background:var(--card);z-index:-1}
+.ftab.s3::after{left:6px;right:-6px;top:-8px}
+.ftab.new{animation:tabUp .38s cubic-bezier(.3,1.3,.5,1)}
+@keyframes tabUp{from{transform:translateY(34px)}to{transform:none}}
+.cab-front{position:relative;height:84px;background:var(--card);border:1px solid var(--pencil);border-radius:3px;display:grid;place-items:center;align-content:center;gap:8px;transform-origin:50% 0;transition:transform .22s ease}
+.cabinet.open .cab-front,.peeking .cab-front{transform:translateY(5px) scale(1.03)}
+.cab-front.settle{animation:settle .3s ease-in}
+@keyframes settle{0%{transform:translateY(5px) scale(1.03)}80%{transform:translateY(-1px) scale(.995)}100%{transform:none}}
+.holder{border:1px solid var(--pencil);background:var(--paper);padding:3px 10px;font-size:.78rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.holder b{color:var(--navy)}
+.handle{width:56px;height:9px;border:1.5px solid var(--pencil);border-top:0;border-radius:0 0 9px 9px}
+.cab-body{position:relative;height:64px;border:1px solid var(--pencil);border-top:0;background:var(--card)}
+.cab-body::after{content:"";position:absolute;left:50%;top:26px;width:56px;height:9px;margin-left:-28px;border:1.5px solid var(--line);border-top:0;border-radius:0 0 9px 9px}
+.cab-peek{display:none;list-style:none;margin:0;padding:12px;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 14px var(--shadow)}
+.peeking .cab-peek{display:grid}
+.cab-peek b{display:block;font-family:var(--f-shape);font-style:italic;font-weight:400;color:var(--navy);font-size:.92rem}
+.cab-peek span{font-family:var(--f-content);font-size:.88rem}
+.current.enter{animation:panelIn .4s ease-out}
+@keyframes panelIn{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+
+/* Focus stages with frosted stack */
+.focus{display:grid;grid-template-columns:minmax(200px,270px) minmax(0,1fr);gap:24px;align-items:start}
+.stack-wrap{display:grid;gap:10px;position:sticky;z-index:3;top:calc(16px + env(safe-area-inset-top,0px))}
+.fstack{display:grid}
+.frost-card{height:64px;margin-top:-36px;border-radius:4px;border:1px solid var(--line);background:var(--sunk);padding:10px 12px;overflow:hidden;box-shadow:0 1px 3px var(--shadow);transition:margin .2s ease,height .2s ease;font-family:var(--f-content)}
+.frost-card:first-child{margin-top:0}
+.frost-text{filter:blur(5px);user-select:none;font-size:.9rem;transition:filter .15s ease}
+.peeking .frost-text{filter:none}
+.peeking .frost-card{height:auto;margin-top:6px}
+.peeking .frost-card:first-child{margin-top:0}
+.stack-note{margin:0;font-size:.85rem;color:var(--muted)}
+.stack-empty{color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:4px;padding:14px;margin:0}
+.group-name{font-family:var(--f-content);font-style:italic;font-size:1.3rem;margin:0;color:var(--navy);overflow-wrap:anywhere}
+
+/* Points */
+.points{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.point{display:grid;gap:6px;padding-left:12px;border-left:3px solid var(--navy-soft);min-width:0}
+.pt-text{margin:0;font-family:var(--f-content);font-style:italic;overflow-wrap:anywhere;color:var(--content-ink)}
+.pt-text::before{content:"“"}.pt-text::after{content:"”"}
+.pt-meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-family:var(--f-ui);font-size:.8rem;color:var(--muted)}
+.pt-link{color:var(--navy);font-weight:700}
+.pt-link::before{content:"↳ "}
+
+/* Chunks & links */
+.chunks{list-style:none;margin:0;padding:0;display:grid;min-width:0}
+.chunk{display:grid;gap:10px;padding:14px 16px;border:var(--box-border);border-radius:var(--panel-r);background:var(--card);min-width:0}
+.chunk-head{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.chunk-head .pt-text{flex:1;min-width:0;padding-top:3px}
+.picks{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.picks legend{font-family:var(--f-ui);font-size:.85rem;font-weight:700;padding:0;margin-bottom:6px;float:left;width:100%}
+.pick{position:relative;cursor:pointer;font-family:var(--f-ui)}
+.pick input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.pick span{display:inline-block;font-size:.85rem;line-height:1.3;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.pick:hover span{border-color:var(--navy)}
+.pick input:checked + span{background:var(--navy);border-color:var(--navy);color:var(--navy-ink);font-weight:700}
+.pick input:focus-visible + span{outline:2px solid var(--navy);outline-offset:2px}
+.link-row{margin-left:22px;padding:12px 0 12px 22px;border-left:2px dashed var(--navy);display:grid;gap:8px;min-width:0}
+.phrases{margin:0;font-size:.85rem;color:var(--muted);font-family:var(--f-ui)}
+.phrases i{font-family:var(--f-content);color:var(--ink)}
+input.cnote{font-size:.95rem;padding:7px 10px}
+.chunk-status{margin:0;font-size:.88rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Outline cards */
+.outline{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.o-item{display:grid;gap:8px;min-width:0}
+.o-card{background:var(--box);border:var(--box-border);border-radius:var(--panel-r);padding:16px 18px;display:grid;gap:10px;min-width:0}
+.o-top{display:flex;align-items:center;gap:10px;min-width:0}
+.o-num{font-family:var(--f-ui);font-size:.85rem;color:var(--navy);border:1.5px solid var(--navy);width:28px;height:28px;display:grid;place-items:center;flex:none;border-radius:50%}
+.o-label{font-family:var(--f-content);font-weight:600;font-size:1.15rem;margin:0;flex:1;min-width:0;color:var(--navy);overflow-wrap:anywhere}
+.move{display:flex;gap:4px;flex:none}
+.o-topic{margin:0;font-family:var(--f-content);font-weight:600;overflow-wrap:anywhere}
+.o-close{margin:0;font-family:var(--f-content);color:var(--muted);overflow-wrap:anywhere}
+.connector{margin-left:13px;padding-left:24px;border-left:2px dashed var(--line);display:grid;gap:6px;padding-block:4px}
+.conn-show{margin:0 0 0 13px;padding:4px 0 4px 24px;border-left:2px dashed var(--line);color:var(--muted);font-size:.92rem;font-family:var(--f-content)}
+.reveal .o-card{animation:unfrost .55s ease both;animation-delay:calc(var(--i,0) * 70ms)}
+@keyframes unfrost{from{filter:blur(6px);opacity:.55}to{filter:none;opacity:1}}
+input.group-label{font-family:var(--f-content);font-weight:700;font-size:1.05rem;color:var(--content-ink)}
+
+/* Final phase: the outline is set on a white page in Times New Roman. It stays an outline:
+   the learner writes the full text later. Paragraphs take Roman numerals, chunks take letters. */
+.paper{position:relative;background:var(--page);border:1px solid var(--line);box-shadow:0 2px 14px var(--shadow);padding:52px clamp(18px,6vw,64px) 44px;max-width:900px;width:100%;justify-self:center;font-family:var(--f-final);color:var(--ink-final);display:grid;gap:14px;line-height:1.6}
+.paper .pg{position:absolute;top:20px;right:26px;margin:0;font-size:.95rem}
+.paper-title{margin:0;text-align:center;font-weight:700;font-size:1.12rem}
+.paper-purpose{margin:0 0 6px;text-align:center}
+.paper .outline{gap:20px}
+.paper .o-card{background:none;border:0;border-radius:0;padding:0;gap:6px;font-family:var(--f-final);color:var(--ink-final)}
+.paper .o-num{border:0;width:auto;height:auto;border-radius:0;font-family:var(--f-final);font-weight:700;font-size:1.05rem;color:var(--ink-final);display:inline}
+.paper .o-label{font-family:var(--f-final);font-weight:700;color:var(--ink-final);font-size:1.05rem}
+.o-lab{font-style:italic}
+.paper .o-topic,.paper .o-close{margin:0;padding-left:2em;font-family:var(--f-final);font-weight:400;color:var(--ink-final)}
+.o-points{list-style:none;margin:0;padding:0 0 0 2em;display:grid;gap:3px}
+.o-point{display:grid;grid-template-columns:1.6em minmax(0,1fr)}
+.o-letter{font-weight:700}
+.o-purpose{font-family:var(--f-ui);font-size:.8rem;color:var(--muted)}
+.o-link{padding-left:1.6em;font-family:var(--f-ui);font-size:.8rem;color:var(--navy)}
+.paper .connector{font-family:var(--f-ui);line-height:1.5}
+.paper-landing{display:grid;gap:6px;font-family:var(--f-ui);line-height:1.5;border-top:1px solid var(--rule);padding-top:14px}
+.paper-landing textarea{font-family:var(--f-final)}
+
+/* Review & revise */
+.rv-step{display:flex;gap:14px;align-items:flex-start;margin-top:14px}
+.rv-step h2{margin:0}
+.rv-n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--navy-ink);display:grid;place-items:center;font-weight:700}
+.rv-paper{gap:2px}
+.rv-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;padding:3px 8px;border-radius:4px}
+.rv-row:hover,.rv-row:focus-within{background:var(--sunk)}
+.rv-row.flagged{box-shadow:inset 3px 0 0 var(--rec)}
+.flag-btn{opacity:.4;font-family:var(--f-ui);font-size:.78rem;font-weight:700;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:2px 10px;color:var(--rec)}
+.rv-row:hover .flag-btn,.flag-btn:focus-visible,.rv-row.flagged .flag-btn{opacity:1}
+@media (hover:none){.flag-btn{opacity:1}}
+.rv-head{margin-top:12px}
+.rv-topic,.rv-synth{padding-left:calc(2em + 8px)}
+.rv-chunk{padding-left:calc(2em + 8px)}
+.rv-clink{padding-left:calc(3.6em + 8px);font-family:var(--f-ui);font-size:.82rem;color:var(--navy)}
+.rv-plink{font-family:var(--f-ui);font-size:.82rem;color:var(--navy);text-align:center}
+.rv-landing{margin-top:12px;border-top:1px solid var(--rule);padding-top:10px}
+.rv-lab{font-style:italic}
+.rv-letter{font-weight:700;display:inline-block;width:1.6em}
+.rv-purpose{font-family:var(--f-ui);font-size:.8rem;color:var(--muted)}
+.flag-note{margin:0 0 4px calc(2em + 8px);padding:3px 10px;border-left:2px solid var(--rec);font-family:var(--f-ui);font-size:.86rem;line-height:1.5;color:var(--ink);display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+.flag-form{margin:4px 0 10px calc(2em + 8px);padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--card);display:grid;gap:8px;font-family:var(--f-ui);line-height:1.5}
+.err{margin:0;color:var(--rec);font-size:.86rem;font-family:var(--f-ui)}
+.traces{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.trace{border:1px solid var(--line);border-left:3px solid var(--rec);background:var(--card);padding:14px 16px;display:grid;gap:8px;min-width:0}
+.trace-quote{margin:0;font-family:var(--f-final);font-size:1.02rem;overflow-wrap:anywhere}
+.trace-note{margin:0;font-size:.9rem;color:var(--muted);overflow-wrap:anywhere}
+.dec-picks{display:grid;gap:6px;border:0;padding:0;margin:0;min-width:0}
+.dec-picks legend{font-size:.85rem;font-weight:700;padding:0;margin-bottom:6px}
+.dec{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:7px 10px;border:1px solid var(--line);border-radius:6px;min-width:0}
+.dec input{accent-color:var(--navy);margin-top:4px;flex:none}
+.dec:has(input:checked){border-color:var(--navy);background:var(--navy-soft)}
+.dec span{display:grid;min-width:0}
+.dec i{font-family:var(--f-final);font-size:.95rem;color:var(--muted);overflow-wrap:anywhere}
+.globals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px}
+.global{border:1px solid var(--line);border-top:3px solid var(--line);background:var(--card);padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0}
+.global.done{border-top-color:var(--ok)}
+.global-show{background:var(--sunk);padding:10px 12px;border-radius:6px;font-family:var(--f-final);font-size:.98rem;line-height:1.55;overflow-wrap:anywhere}
+.gl-list{margin:0;padding-left:1.1em;display:grid;gap:4px}
+.gl-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.gl-rel{font-family:var(--f-ui);font-size:.78rem;color:var(--navy);border:1px solid var(--bubble-line);border-radius:999px;padding:1px 8px}
+.gl-status{margin:0}
+.rv-break{margin:0;padding:10px 14px;border-left:3px solid var(--navy);background:var(--sunk);font-size:.92rem;max-width:72ch}
+.rv-edit .o-card.edit{background:var(--card)}
+
+/* Decision marks */
+.marks{display:grid;gap:10px;padding:12px 16px;background:var(--sunk);border-radius:8px;min-width:0;font-family:var(--f-ui);line-height:1.5}
+.mark-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mark{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start}
+.mark-tags{display:flex;gap:4px;flex-wrap:wrap}
+.mark-why{overflow-wrap:anywhere;font-family:var(--f-content)}
+.pill{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--navy-soft);color:var(--navy);white-space:nowrap}
+.pill.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.mark-form{display:grid;gap:8px}
+.mf-row{display:flex;flex-wrap:wrap;gap:10px}
+.mf-row label{display:grid;gap:4px;font-size:.85rem;font-weight:700;flex:1 1 180px;min-width:0}
+.mf-why{display:grid;gap:4px;font-size:.85rem;font-weight:700}
+.mark-form .secondary{justify-self:start}
+
+/* Explain + revise */
+.panel-title{font-family:var(--f-content);font-weight:600;margin:0;font-size:1.12rem;color:var(--navy)}
+.expl-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.expl-list li{background:var(--sunk);border-radius:8px;padding:8px 12px;overflow-wrap:anywhere;font-family:var(--f-content)}
+.revise{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:20px;align-items:start}
+.revise .checklist{order:2;position:sticky;top:calc(16px + env(safe-area-inset-top,0px))}
+.checklist ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.checklist label{display:flex;gap:8px;align-items:flex-start}
+.o-card.edit{gap:10px;font-family:var(--f-ui);line-height:1.55}
+details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
+
+/* Completion cue */
+#cue{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);background:var(--toast-bg);color:var(--toast-ink);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;width:max-content;max-width:calc(100% - 32px);font-weight:700;z-index:30;box-shadow:0 6px 20px var(--shadow)}
+#cue.show{opacity:1;transform:translate(-50%,0)}
+
+/* Research log drawer */
+#logpanel{position:fixed;top:0;right:0;bottom:0;width:min(430px,100%);background:var(--card);border-left:1px solid var(--line);
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) 16px;
+  overflow:auto;z-index:40;box-shadow:-8px 0 24px var(--shadow);display:grid;gap:14px;align-content:start;font-family:var(--f-ui)}
+#logpanel .panel{border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+[hidden]{display:none!important}
+.live-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.live-row select{width:auto}
+#live-btn[aria-pressed="true"]{background:var(--rec);border-color:var(--rec);color:#fff}
+.live-cap{margin:0;min-height:2.9em;padding:8px 12px;border:1.5px dashed var(--pencil);border-radius:var(--wob-lg);background:var(--card);color:var(--ink);font-family:var(--f-draft)}
+.live-cap.idle{color:var(--muted);font-style:italic;font-family:var(--f-ui)}
+.live-cap mark{background:none;color:inherit;border-bottom:1.8px solid var(--navy)}
+details.type-instead summary{cursor:pointer;color:var(--navy);font-size:.95rem}
+details.type-instead[open]{display:grid;gap:8px}
+.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;border:0;padding:0;margin:0;min-width:0}
+.styles legend{font-weight:700;font-size:.95rem;margin-bottom:6px;padding:0}
+.style-opt{display:grid;gap:8px;border:1.5px solid var(--line);border-radius:var(--wob-lg);padding:14px 16px;background:var(--card);cursor:pointer;min-width:0}
+.style-opt:has(input:checked){border-color:var(--navy)}
+.style-top{display:flex;gap:8px;align-items:baseline;font-weight:700}
+.style-top input{accent-color:var(--navy)}
+.style-use{margin:0;color:var(--muted);font-size:.92rem}
+.guide{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:.95rem}
+.guide li{display:grid;gap:1px}
+.guide code{font-family:var(--f-final);font-size:1.02rem;background:var(--sunk);padding:1px 6px;border-radius:3px}
+.info-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.info-card{background:var(--card);border:1.5px solid var(--pencil);border-radius:var(--wob-lg);padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0;position:relative}
+.info-card::before{content:"";position:absolute;top:14px;right:16px;width:10px;height:10px;border-radius:50%;background:var(--src)}
+.ic-cite{display:grid;gap:4px;min-width:0}
+.ic-intext{margin:0 0 6px;display:flex;flex-wrap:wrap;gap:4px 10px;font-family:var(--f-final);font-size:1.02rem}
+.ic-intext .sep{color:var(--muted)}
+.ic-ref{margin:0;line-height:1.75;padding-left:1.5em;text-indent:-1.5em;overflow-wrap:anywhere;font-family:var(--f-final);font-size:1.02rem}
+.rp{border-bottom:2px solid var(--line);padding-bottom:1px}
+.rp-author{border-color:var(--s0)}.rp-year{border-color:var(--s1)}.rp-title{border-color:var(--s2)}.rp-source{border-color:var(--s3)}.rp-location{border-color:var(--s4)}.rp-doi{border-color:var(--s5)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;list-style:none;margin:0;padding:0;font-size:.95rem}
+.notes{margin:0;padding-left:1.2rem;display:grid;gap:4px}
+.ic-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.ic-fields label{display:grid;gap:2px;font-size:.85rem;font-weight:700;min-width:0}
+.ic-fields .wide{grid-column:1/-1}
+.ic-fields input[type="text"],.ic-fields textarea{padding:6px 8px;font-size:.95rem;font-family:var(--f-ui);border-radius:6px;border-width:1px}
+.ic-edit summary{cursor:pointer;color:var(--navy);font-size:.92rem}
+.ic-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ref-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+details.style-guide summary{cursor:pointer;color:var(--navy);font-size:.95rem}
+details.style-guide[open] summary{margin-bottom:8px}
+.hull-head{position:absolute;top:8px;left:10px;right:10px;display:flex;gap:6px;align-items:center;pointer-events:auto}
+.hull-grip{flex:none;font-family:var(--f-ui);font-size:.8rem;color:var(--navy);border:1.5px solid var(--navy);border-radius:var(--wob);padding:1px 8px;background:var(--card);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+input.hull-name{flex:1;width:auto;min-width:0;font-family:var(--f-draft);font-weight:500;font-size:.95rem;line-height:1.3;color:var(--navy);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+.hull-name::placeholder{font-weight:400}
+.hull.moving{visibility:hidden}
+@media (max-width:560px){.ic-fields{grid-template-columns:1fr 1fr}}
+.lp-head{display:flex;justify-content:space-between;align-items:baseline}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:var(--sunk);padding:8px 10px;border-radius:8px;font-size:.82rem;color:var(--muted)}
+.metric b{display:block;font-family:var(--f-mono);font-weight:500;font-size:1.15rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.ev{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);max-height:15rem;overflow:auto;white-space:pre-wrap;margin:0;background:var(--sunk);padding:8px;border-radius:8px}
+.json{font-family:var(--f-mono);font-size:.72rem;min-height:12rem}
+
+@media (max-width:860px){
+  .revise{grid-template-columns:1fr}
+  .revise .checklist{order:0;position:static}
+}
+@media (max-width:760px){
+  .focus{grid-template-columns:1fr}
+  .stack-wrap{order:2;position:static}
+}
+@media (max-width:560px){
+  .mark{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+  .loop path{stroke-dashoffset:0}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="wordmark">WriteFlow</span><span class="sub">Literature review outline · demo with example data</span></div>
+    <nav id="rail" aria-label="Your progress"></nav>
+    <div class="tools">
+      <button class="ghost-btn" id="btn-log" type="button">Session log</button>
+      <button class="ghost-btn" id="btn-reset" type="button">Start over</button>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+<aside id="logpanel" hidden aria-label="Session log"></aside>
+<div id="cue" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   CONFIG — switch aiMode to 'remote' once the backend proxy exists.
+   ========================================================= */
+const CONFIG = {
+  aiMode: 'mock',                    // 'mock' | 'remote'
+  remoteEndpoint: '/api/writeflow',  // backend proxy (never call the model from the browser)
+  allowPeek: true,
+  demo: true,
+  storageKey: 'writeflow.demo.v11'
+};
+
+/* Three phases set the look: draft (pencil sketch) → shape (structured notes) → final (APA 7 student paper). */
+const STAGES = [
+  {id:'purpose',   name:'Purpose',            phase:'draft'},
+  {id:'sources',   name:'Sources',            phase:'draft'},
+  {id:'map',       name:'Source map',         phase:'draft'},
+  {id:'topics',    name:'Topic sentences',    phase:'shape'},
+  {id:'chunks',    name:'Chunks & links',     phase:'shape'},
+  {id:'synthesis', name:'Your synthesis',     phase:'shape'},
+  {id:'logic',     name:'Order & conclusion', phase:'final'},
+  {id:'review',    name:'Review & revise',    phase:'final'}
+];
+function phaseOf(id){ return (STAGES.find(s=>s.id===id) || STAGES[0]).phase; }
+const LEVELS = [
+  {id:'flow',      name:'Overall flow'},
+  {id:'paragraph', name:'Paragraph structure'},
+  {id:'sentence',  name:'Sentence'},
+  {id:'word',      name:'Word choice'}
+];
+const TAGS = ['Background','Claim','Example','Counterargument','Transition','Conclusion'];
+/* Paragraph structure. A chunk is one bubble with the sources stacked under it.
+   The outline fixes only the structure: what each chunk does and how it links to the one before.
+   Signal phrases are shown for later drafting and are never inserted into the outline. */
+const PURPOSES = [
+  {id:'common',    name:'Common finding'},
+  {id:'evidence',  name:'Adds evidence'},
+  {id:'different', name:'Different view'},
+  {id:'qualify',   name:'Qualifies'},
+  {id:'evaluate',  name:'My evaluation'},
+  {id:'gap',       name:'Points to a gap'}
+];
+const RELATIONS = [
+  {id:'similar',  name:'Similar',      phrases:['Similarly, …','Likewise, …','X also finds …','Consistent with X, …']},
+  {id:'contrast', name:'Contrast',     phrases:['In contrast, …','Whereas X …, Y …','Unlike X, Y …','However, …']},
+  {id:'concede',  name:'Concession',   phrases:['Although X …, Y convincingly shows …','While X …, …']},
+  {id:'extend',   name:'Extends',      phrases:['Building on this, …','Furthermore, …','X goes further: …']},
+  {id:'explain',  name:'Explains why', phrases:['One reason is …','This may be because …','X helps explain this: …']}
+];
+function relName(id){ const r = RELATIONS.find(x=>x.id===id); return r ? r.name : ''; }
+function purposeLabel(pt){
+  const u = PURPOSES.find(x=>x.id===pt.purposeId), note = String(pt.purposeNote || '').trim();
+  return u && note ? u.name + ': ' + note : (u ? u.name : note);
+}
+const STYLES = {
+  apa: {
+    name:'APA, 7th edition', short:'APA',
+    use:'Standard in education, psychology and much of the social sciences.',
+    pattern:'(Author, Year)',
+    rules:[
+      ['Author and year, with a comma between', '(Hawari et al., 2022)'],
+      ['Two authors: “&” in parentheses, “and” in a sentence', '(Lee & Park, 2020) · Lee and Park (2020)'],
+      ['Three or more authors: first author + “et al.”', '(Gupta et al., 2022)'],
+      ['Quotes add the page with “p.”', '(Hawari et al., 2022, p. 5)'],
+      ['Author in your sentence: year in parentheses', 'Hawari et al. (2022) report…']
+    ],
+    refNotes:[
+      'Surname first, then initials; “&” before the last author.',
+      'Year in parentheses, right after the authors.',
+      'Article title in sentence case: capitalize only the first word, the first word after a colon, and proper nouns.',
+      'Journal name and volume in italics; issue in parentheses.',
+      'DOI as a full link, with no period after it.'
+    ],
+    titleCheck:'Article titles in my references use sentence case.'
+  },
+  chicago: {
+    name:'Chicago, author-date (18th edition)', short:'Chicago',
+    use:'Used in some social sciences and sciences. Chicago’s other system, notes and bibliography with footnotes, is common in history and the humanities and is not covered here.',
+    pattern:'(Author Year)',
+    rules:[
+      ['Author and year, no comma between', '(Hawari et al. 2022)'],
+      ['Two authors: always “and”, never “&”', '(Lee and Park 2020)'],
+      ['Three or more authors: first author + “et al.”', '(Gupta et al. 2022)'],
+      ['Pages follow a comma, without “p.”', '(Hawari et al. 2022, 5)'],
+      ['Author in your sentence: year in parentheses', 'Hawari et al. (2022) report…']
+    ],
+    refNotes:[
+      'First author surname first; the others given name first; “and” before the last author.',
+      'Year right after the authors, without parentheses.',
+      'Article title in quotation marks and headline case: capitalize the major words.',
+      'Journal name in italics, then volume, issue in parentheses, a colon and the pages.',
+      'DOI as a full link, ending with a period.'
+    ],
+    titleCheck:'Article titles in my references use headline case.'
+  }
+};
+const REF_ROLES = [['author','Authors'],['year','Year'],['title','Title'],['source','Journal'],['location','Volume, issue, pages'],['doi','DOI']];
+const CHECKLIST_BASE = [
+  'Each paragraph is about one theme, not one source.',
+  'Each chunk says what it does and names the sources behind it.',
+  'Each link between chunks names a relation, not just “and”.',
+  'Each paragraph ends with my own synthesis, not a summary of one source.',
+  'Each link between paragraphs names a relation.',
+  'The conclusion names the gap my review points to.'
+];
+function checklistItems(){
+  const st = STYLES[state.citationStyle];
+  return CHECKLIST_BASE.concat(st ? [st.titleCheck] : []);
+}
+
+/* Board geometry: a large working surface, zoomable */
+const BW = 1800, BH = 1150;
+const UNSURE_W = 270, UNSURE_X = BW - UNSURE_W;
+const ARCHIVE_H = 140, ARCHIVE_Y = BH - ARCHIVE_H;
+const CARD_W = 208, CARD_H = 108, STACK_W = 236;
+const LINK_GAP = 64;      // stacks closer than this read as one theme
+const SNAP_R = 70;        // magnetic range, board px
+const ZMIN = 0.4, ZMAX = 1.6;
+
+/* Example learner: first language Bengali. Reference details checked against the project's PDFs. */
+const EXAMPLE_L1 = 'Bengali (বাংলা)';
+const EXAMPLE_PURPOSE = 'What makes academic writing hard for international graduate students, and what support is missing?';
+const EXAMPLE_REFS = [
+  {authors:[['Gupta','Shikha'],['Jaiswal','Atul'],['Paramasivam','Abinethaa'],['Kotecha','Jyoti']], year:'2022',
+   title:{apa:'Academic writing challenges and supports: Perspectives of international doctoral students and their supervisors',
+          chicago:'Academic Writing Challenges and Supports: Perspectives of International Doctoral Students and Their Supervisors'},
+   container:'Frontiers in Education', volume:'7', issue:'', pages:'Article 891534', doi:'10.3389/feduc.2022.891534',
+   highlights:['EAL doctoral students face substantial writing challenges and receive little explicit writing instruction.']},
+  {authors:[['Hawari',"Omar Moh'd Amer"],['Al-Shboul','Yasser'],['Huwari','Ibrahim Fathi']], year:'2022',
+   title:{apa:'Supervisors’ perspectives on graduate students’ problems in academic writing',
+          chicago:'Supervisors’ Perspectives on Graduate Students’ Problems in Academic Writing'},
+   container:'European Journal of Educational Research', volume:'11', issue:'1', pages:'545–556', doi:'10.12973/eu-jer.11.1.545',
+   highlights:['Supervisors report problems with grammar, vocabulary and reporting verbs.','Supervisors also see low motivation and writing apprehension.','Students struggle to structure the thesis as a whole.']},
+  {authors:[['Mehar Singh','Manjet Kaur']], year:'2016',
+   title:{apa:'An emic perspective on academic writing difficulties among international graduate students in Malaysia',
+          chicago:'An Emic Perspective on Academic Writing Difficulties among International Graduate Students in Malaysia'},
+   container:'GEMA Online Journal of Language Studies', volume:'16', issue:'3', pages:'83–97', doi:'',
+   highlights:['Home literacy practices do not match graduate writing expectations.','Methodology and discussion sections are the hardest to write.']},
+  {authors:[['Gürel Cennetkuşu','Nazmiye']], year:'2017',
+   title:{apa:'International students’ challenges in academic writing: A case study from a prominent U.S. university',
+          chicago:'International Students’ Challenges in Academic Writing: A Case Study from a Prominent U.S. University'},
+   container:'Journal of Language and Linguistic Studies', volume:'13', issue:'2', pages:'309–323', doi:'',
+   highlights:['Success depends on students, professors and instructors knowing each other’s expectations.']},
+  {authors:[['Lin','Linda H. F.'],['Morrison','Bruce']], year:'2021',
+   title:{apa:'Challenges in academic writing: Perspectives of engineering faculty and L2 postgraduate research students',
+          chicago:'Challenges in Academic Writing: Perspectives of Engineering Faculty and L2 Postgraduate Research Students'},
+   container:'English for Specific Purposes', volume:'63', issue:'', pages:'59–70', doi:'10.1016/j.esp.2021.03.004',
+   highlights:['Students worry most about sentence-level language, while faculty worry most about discourse-level features.','Some student strategies, such as using Google Translate, do not meet faculty expectations.']}
+];
+/* Bengali example lines (to be checked by a Bengali-speaking student). */
+const BN = {
+  notOnlyGrammar: 'শুধু ব্যাকরণ না: structure is hard too',
+  noOneExplains:  'কেউ বলে না কী expected',
+  talk:           'ছাত্ররা বাক্য নিয়ে চিন্তা করে, শিক্ষকরা পুরো কাঠামো নিয়ে।',
+  markWhy:        'Claim আগে দিলাম, যাতে reader শুরুতেই বোঝে সমস্যাটা শুধু grammar না।',
+  flagNote:       'এই link টা ঠিক লাগছে না: is it really a contrast?'
+};
+
+/* =========================================================
+   STORE — per-browser only. Replace with a server store for the pilot.
+   ========================================================= */
+function blankState(){
+  return {schema:'writeflow.session.v7', stage:'purpose', isExample:true,
+    purpose:EXAMPLE_PURPOSE, citationStyle:'', sources:[], sourcesSeeded:false,
+    canvas:{items:[], hintsOn:false, seeded:false, zoom:null, liveLang:'en-US'},
+    paragraphs:[], cursor:0, conclusion:'', review:{flags:[], globals:{}},
+    versions:[], log:[], checklist:{}, startedAt:Date.now()};
+}
+function loadState(){
+  try{ const raw = localStorage.getItem(CONFIG.storageKey); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+const saved = loadState();
+let state = Object.assign(blankState(), saved || {});
+if(!STAGES.some(s=>s.id===state.stage)) state.stage = 'purpose';
+if(stageIndex(state.stage) > stageIndex('map') && !state.paragraphs.length) state.stage = 'map';
+let saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); }catch(e){} }, 250);
+}
+
+/* =========================================================
+   LOGGER — research events. Shape: {t, stage, type, ...data}
+   ========================================================= */
+const Logger = {
+  log(type, data){
+    state.log.push(Object.assign({t:Date.now(), stage:state.stage, type}, data || {}));
+    if(state.log.length > 4000) state.log.shift();
+    save();
+    if(!logPanel.hidden) renderLog();
+  }
+};
+function snapshot(reason){
+  state.versions.push({t:Date.now(), stage:state.stage, reason,
+    paragraphs:JSON.parse(JSON.stringify(state.paragraphs)),
+    canvas:JSON.parse(JSON.stringify(state.canvas.items)),
+    conclusion:state.conclusion});
+  Logger.log('version_saved', {reason, n:state.versions.length});
+}
+
+/* =========================================================
+   AI ADAPTER CONTRACT (all async)
+   parseReference({text}) -> {authors:[{last,given}], year, title, container, volume, issue, pages, doi} | null
+   splitStatements({text}) -> string[]   (word for word; L1 kept; splits on . ! ? 。 ！ ？ ।)
+   suggestLinks({bubbles, cards}) -> [{cardId, bubbleId, term}]   (faint hints only)
+   nextStepPrompt({stage, paragraph}) -> string   (placeholder question, no judgment)
+   decisionPrompt({level, tag, paragraph}) -> string   (sentence starter ending in "…")
+   ========================================================= */
+const STOP = new Set(('about above after again against their there these those which while would could should other also into from with that this were have been they them then than when what where your more most some such only very just over under both each between because through during before being does doing having here itself same student students').split(' '));
+function terms(s){ return new Set((String(s).toLowerCase().match(/[a-zÀ-ɏ]{5,}/g) || []).filter(w=>!STOP.has(w))); }
+const MockAI = {
+  async parseReference({text}){
+    const t = String(text).replace(/\s+/g,' ').trim();
+    const m = t.match(/^(.+?)\s*\((\d{4}[a-z]?|n\.d\.)\)\.\s*(.+?[.?!])\s+((?:(?!\.\s)[^,])+?),\s*(\d+)(?:\s*\(([^)]+)\))?(?:,\s*([^.]+?))?\.\s*(\S+)?$/);
+    if(!m) return null;
+    const tokens = m[1].replace(/\s*&\s*/g,' ').replace(/\.\s*\.\s*\./g,'').split(/,\s*/).map(x=>x.trim()).filter(Boolean);
+    const authors = [];
+    for(let i=0;i<tokens.length;i++){
+      const nx = tokens[i+1];
+      if(nx && /^(\p{Lu}\.\s?-?\s?)+$/u.test(nx)){ authors.push({last:tokens[i], given:nx}); i++; }
+      else authors.push({last:tokens[i], given:''});
+    }
+    return {authors, year:m[2], title:m[3].replace(/\.$/,''), container:m[4].trim(), volume:m[5], issue:m[6] || '', pages:m[7] || '',
+      doi:(m[8] || '').replace(/^https?:\/\/(dx\.)?doi\.org\//,'')};
+  },
+  async splitStatements({text}){ return splitLocal(text); },
+  async suggestLinks({bubbles, cards}){
+    const out = [];
+    for(const c of cards){
+      const ct = terms(c.text); let best = null;
+      for(const b of bubbles){
+        for(const w of terms(b.text)){ if(ct.has(w) && (!best || w.length > best.term.length)) best = {cardId:c.id, bubbleId:b.id, term:w}; }
+      }
+      if(best) out.push(best);
+    }
+    return out.slice(0,6);
+  },
+  async nextStepPrompt({stage, paragraph}){
+    const l = paragraph && paragraph.label ? '“' + paragraph.label + '”' : 'this part';
+    const bank = {
+      map:        'What do these cards say together?',
+      themes:     'What would you call this group?',
+      topics:     'What do these sources, together, say about ' + l + '?',
+      synthesis:  'What do these chunks add up to that no single source says?',
+      logic:      'How does the next part follow from ' + l + '?',
+      conclusion: 'What is still missing in what you read?',
+      explain:    'Reading it now, what does each part seem to do?'
+    };
+    return bank[stage] || 'What comes next?';
+  },
+  async decisionPrompt({level, tag}){
+    const map = {
+      Background:'You set this up as background so that readers…',
+      Claim:'You made this your claim because…',
+      Example:'You chose this evidence because…',
+      Counterargument:'You brought in this other view because…',
+      Transition:'You placed this link here so that…',
+      Conclusion:'You end here because…'
+    };
+    return map[tag] || ('At the ' + levelName(level).toLowerCase() + ' level, you chose this because…');
+  }
+};
+function splitLocal(text){
+  return String(text).split(/\n+|(?<=[.!?。！？।])\s+/).map(s=>s.trim()).filter(s=>s.length>1);
+}
+const RemoteAI = {
+  async call(task, payload){
+    const r = await fetch(CONFIG.remoteEndpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({task, payload})});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  },
+  async parseReference(i){ return (await this.call('parse_reference', i)).source; },
+  async splitStatements(i){ return (await this.call('split_statements', i)).statements; },
+  async suggestLinks(i){ return (await this.call('suggest_links', i)).links; },
+  async nextStepPrompt(i){ return (await this.call('next_step_prompt', {stage:i.stage, paragraph:i.paragraph && {label:i.paragraph.label}})).prompt; },
+  async decisionPrompt(i){ return (await this.call('decision_prompt', {level:i.level, tag:i.tag})).prompt; }
+};
+let AI = CONFIG.aiMode === 'remote' ? RemoteAI : MockAI;
+const promptCache = new Map();
+async function ai(method, input, cacheKey){
+  if(cacheKey && promptCache.has(cacheKey)) return promptCache.get(cacheKey);
+  let out;
+  try{ out = await AI[method](input); }
+  catch(e){ Logger.log('ai_error', {method, message:String(e && e.message || e)}); out = await MockAI[method](input); }
+  if(cacheKey) promptCache.set(cacheKey, out);
+  return out;
+}
+
+/* TRANSCRIBER CONTRACT: transcribe(file) -> string */
+const Transcriber = {
+  async transcribe(file){
+    if(file.type.startsWith('text/')) return await file.text();
+    return '[Recording: ' + file.name + ' — transcription connects here]';
+  }
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function $(s, r){ return (r || document).querySelector(s); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function stageIndex(id){ return STAGES.findIndex(s=>s.id===id); }
+function levelName(id){ return (LEVELS.find(l=>l.id===id) || {name:''}).name; }
+function reduceMotion(){ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function findP(id){ return state.paragraphs.find(p=>p.id===id); }
+function items(){ return state.canvas.items; }
+function itemById(id){ return items().find(i=>i.id===id); }
+function cardsUnder(bid){ return items().filter(i=>i.kind==='card' && i.under===bid); }
+function sourceById(id){ return state.sources.find(s=>s.id===id); }
+function srcIndex(sid){ const k = state.sources.findIndex(s=>s.id===sid); return 's' + ((k < 0 ? 0 : k) % 6); }
+function citeOf(sid){ const s = sourceById(sid); return s ? inText(s) : 'Removed source'; }
+function stripParens(t){ return String(t).replace(/^\(|\)$/g,''); }
+function srcChips(cards){
+  const seen = []; for(const c of cards) if(!seen.includes(c.source)) seen.push(c.source);
+  if(!seen.length) return '<p class="note">No sources stacked yet.</p>';
+  const combined = '(' + seen.map(s=>stripParens(citeOf(s))).join('; ') + ')';
+  return '<ul class="src-chips">' + seen.map(s=>'<li class="src-chip '+srcIndex(s)+'">'+esc(citeOf(s))+'</li>').join('') + '</ul>' +
+    '<span class="cite-inline">'+esc(combined)+'</span>';
+}
+function styleGuide(key){
+  const st = STYLES[key]; if(!st) return '';
+  return '<ul class="guide">' + st.rules.map(r=>'<li><span>'+esc(r[0])+'</span><span><code>'+esc(r[1])+'</code></span></li>').join('') + '</ul>';
+}
+function guideDetails(){
+  const st = STYLES[state.citationStyle]; if(!st) return '';
+  return '<details class="style-guide"><summary>How '+esc(st.short)+' cites in the text</summary>'+styleGuide(state.citationStyle)+'</details>';
+}
+
+/* Citation formatting */
+function authorsOf(s){ return (s.authors || []).filter(a=>a.last && a.last.trim()); }
+function yearOf(s){ return String(s.year || '').trim() || 'n.d.'; }
+function initialsOf(given){
+  return String(given || '').trim().split(/\s+/).filter(Boolean)
+    .map(t=>t.split('-').map(x=>{ const c = x.replace(/[^\p{L}]/gu,'').charAt(0); return c ? c.toUpperCase()+'.' : ''; }).filter(Boolean).join('-'))
+    .filter(Boolean).join(' ');
+}
+function inText(s, narrative){
+  const st = state.citationStyle || 'apa', a = authorsOf(s), y = yearOf(s);
+  let names;
+  if(!a.length) names = s.title ? '“' + s.title.trim().split(/\s+/).slice(0,4).join(' ') + '…”' : 'Untitled source';
+  else if(a.length === 1) names = a[0].last.trim();
+  else if(a.length === 2) names = a[0].last.trim() + ((narrative || st === 'chicago') ? ' and ' : ' & ') + a[1].last.trim();
+  else names = a[0].last.trim() + ' et al.';
+  if(narrative) return names + ' (' + y + ')';
+  return st === 'apa' ? '(' + names + ', ' + y + ')' : '(' + names + ' ' + y + ')';
+}
+function doiUrl(d){ d = String(d || '').trim().replace(/^doi:\s*/i,''); if(!d) return ''; return /^10\./.test(d) ? 'https://doi.org/' + d : d; }
+function endPunct(t, p){ return /[.?!]$/.test(t) ? t : t + p; }
+function refParts(s){
+  const st = state.citationStyle || 'apa', a = authorsOf(s), y = yearOf(s);
+  const title = String(s.title || '').trim(), journal = String(s.container || '').trim();
+  const vol = String(s.volume || '').trim(), iss = String(s.issue || '').trim(), pg = String(s.pages || '').trim().replace(/(\d)\s*[-‐‑]\s*(\d)/g,'$1–$2'), doi = doiUrl(s.doi);
+  const parts = [];
+  if(st === 'apa'){
+    const list = a.map(x=>x.last.trim() + (initialsOf(x.given) ? ', ' + initialsOf(x.given) : ''));
+    let au = '';
+    if(list.length === 1) au = list[0];
+    else if(list.length === 2) au = list[0] + ', & ' + list[1];
+    else if(list.length > 20) au = list.slice(0,19).join(', ') + ', . . . ' + list.at(-1);
+    else if(list.length) au = list.slice(0,-1).join(', ') + ', & ' + list.at(-1);
+    if(au) parts.push(['author', esc(au)]);
+    parts.push(['year', esc('(' + y + ').')]);
+    if(title) parts.push(['title', esc(endPunct(title, '.'))]);
+    if(journal){
+      let loc = '';
+      if(vol) loc += '<i>' + esc(vol) + '</i>' + (iss ? '(' + esc(iss) + ')' : '');
+      if(pg) loc += (loc ? ', ' : '') + esc(pg);
+      parts.push(['source', '<i>' + esc(journal) + '</i>' + (loc ? ',' : '.')]);
+      if(loc) parts.push(['location', loc + '.']);
+    }
+    if(doi) parts.push(['doi', esc(doi)]);
+  } else {
+    const full = x => (x.given && x.given.trim() ? x.given.trim() + ' ' : '') + x.last.trim();
+    const inv = x => x.last.trim() + (x.given && x.given.trim() ? ', ' + x.given.trim() : '');
+    let au = '';
+    if(a.length === 1) au = inv(a[0]);
+    else if(a.length === 2) au = inv(a[0]) + ', and ' + full(a[1]);
+    else if(a.length > 6) au = [inv(a[0]), full(a[1]), full(a[2])].join(', ') + ', et al.';
+    else if(a.length) au = [inv(a[0])].concat(a.slice(1,-1).map(full)).join(', ') + ', and ' + full(a.at(-1));
+    if(au) parts.push(['author', esc(endPunct(au, '.'))]);
+    parts.push(['year', esc(y + '.')]);
+    if(title) parts.push(['title', esc('“' + endPunct(title, '.') + '”')]);
+    if(journal){
+      const loc = ((vol ? vol : '') + (iss ? ' (' + iss + ')' : '') + (pg ? ': ' + pg.replace(/^article\s+/i,'') : '')).trim();
+      parts.push(['source', '<i>' + esc(journal) + '</i>' + (loc ? '' : '.')]);
+      if(loc) parts.push(['location', esc(loc) + '.']);
+    }
+    if(doi) parts.push(['doi', esc(doi) + '.']);
+  }
+  return parts;
+}
+function refHTML(s){ return refParts(s).map(p=>'<span class="rp rp-'+p[0]+'">'+p[1]+'</span>').join(' '); }
+function refPlain(s){
+  const d = document.createElement('div'); d.innerHTML = refParts(s).map(p=>p[1]).join(' '); return d.textContent;
+}
+function sortKey(s){ const a = authorsOf(s); return ((a[0] ? a[0].last : s.title || '') + ' ' + yearOf(s)).toLowerCase(); }
+function legendHTML(){ return '<ul class="legend">' + REF_ROLES.map(r=>'<li><span class="rp rp-'+r[0]+'">'+esc(r[1])+'</span></li>').join('') + '</ul>'; }
+function hlLines(s){ return String(s.highlights || '').split(/\n+/).map(l=>l.trim().replace(/^[-*•]\s*/,'')).filter(Boolean); }
+function authorsText(s){ return (s.authors || []).map(a=>a.last + (a.given ? ', ' + a.given : '')).join('\n'); }
+function sourceComplete(s){ return authorsOf(s).length && String(s.year||'').trim() && String(s.title||'').trim() && String(s.container||'').trim(); }
+function citeBlock(s){
+  return '<span class="mini">In the text</span><p class="ic-intext"><span>'+esc(inText(s))+'</span><span class="sep">·</span><span>'+esc(inText(s, true))+'</span></p>' +
+    '<span class="mini">In the reference list</span><p class="ic-ref">'+refHTML(s)+'</p>';
+}
+function fieldHTML(s, key, label, opts){
+  opts = opts || {};
+  const id = 'sf-' + key + '-' + s.id, v = key === 'authors' ? authorsText(s) : (s[key] || '');
+  const ctl = opts.area
+    ? '<textarea id="'+id+'" rows="'+(opts.rows || 2)+'" data-sfield="'+key+'" data-sid="'+s.id+'" data-track="source-'+key+'" placeholder="'+esc(opts.ph || '')+'">'+esc(v)+'</textarea>'
+    : '<input type="text" id="'+id+'" data-sfield="'+key+'" data-sid="'+s.id+'" data-track="source-'+key+'" value="'+esc(v)+'" placeholder="'+esc(opts.ph || '')+'">';
+  return '<label for="'+id+'"'+(opts.wide ? ' class="wide"' : '')+'>'+esc(label)+ctl+'</label>';
+}
+function editDetails(s, open){
+  return '<details class="ic-edit"'+(open ? ' open' : '')+'><summary>Edit details</summary><div class="ic-fields">' +
+    fieldHTML(s,'authors','Authors, one per line: Surname, Given names',{area:true, rows:3, wide:true, ph:'Hawari, Omar Moh’d Amer'}) +
+    fieldHTML(s,'title','Article title',{area:true, wide:true}) +
+    fieldHTML(s,'container','Journal',{wide:true}) +
+    fieldHTML(s,'year','Year') + fieldHTML(s,'volume','Volume') + fieldHTML(s,'issue','Issue') + fieldHTML(s,'pages','Pages or article no.') +
+    fieldHTML(s,'doi','DOI',{wide:true, ph:'10.xxxx/xxxxx'}) +
+  '</div></details>';
+}
+function zoneOf(cx, cy){ return cy >= ARCHIVE_Y ? 'archive' : (cx >= UNSURE_X ? 'unsure' : 'work'); }
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+const main = $('#main');
+const logPanel = $('#logpanel');
+let justRevealed = false;
+let rendered = false;
+let justFiled = false;
+
+function cue(msg, isCompletion){
+  const t = $('#cue'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(cue._t); cue._t = setTimeout(()=>t.classList.remove('show'), 3800);
+  if(isCompletion) Logger.log('completion_cue', {msg});
+}
+
+/* Stage change. Crossing into a new phase plays the metamorphosis:
+   1) the old screen takes on the new phase's borders, highlighter and paper while keeping its font,
+   2) it fades, 3) the new screen arrives in the new font. */
+let morphing = false;
+function go(stage){
+  if(typeof stopLive === 'function') stopLive();
+  const from = phaseOf(state.stage), to = phaseOf(stage);
+  state.stage = stage; state.cursor = 0;
+  Logger.log('stage_enter', {});
+  save();
+  if(from !== to && rendered && !reduceMotion()){
+    morphing = true;
+    Logger.log('phase_change', {from, to});
+    main.style.setProperty('--f-content', 'var(--f-' + from + ')');
+    document.body.dataset.phase = to;
+    setTimeout(()=>{
+      main.classList.add('morph-fade');
+      setTimeout(()=>{
+        main.style.removeProperty('--f-content');
+        render(); window.scrollTo(0,0);
+        main.classList.remove('morph-fade'); main.classList.add('morph-in');
+        setTimeout(()=>{ main.classList.remove('morph-in'); morphing = false; }, 480);
+      }, 230);
+    }, 620);
+    return;
+  }
+  render(); window.scrollTo(0,0);
+}
+function copyText(text, okMsg, fallbackEl){
+  const fallback = () => {
+    if(fallbackEl){ fallbackEl.focus(); fallbackEl.select(); cue('Copying is blocked here. The text is selected; press Ctrl+C or ⌘C.'); }
+    else cue('Copying is blocked here. Open the session log and select the text there.');
+  };
+  try{ navigator.clipboard.writeText(text).then(()=>cue(okMsg), fallback); }
+  catch(e){ fallback(); }
+}
+
+/* =========================================================
+   SOURCES → CARDS
+   ========================================================= */
+function seedSources(){
+  if(state.sourcesSeeded) return;
+  state.sourcesSeeded = true;
+  if(!state.isExample || state.sources.length) return;
+  const key = state.citationStyle || 'apa';
+  state.sources = EXAMPLE_REFS.map(r=>({id:uid(), authors:r.authors.map(a=>({last:a[0], given:a[1]})), year:r.year,
+    title:r.title[key], container:r.container, volume:r.volume, issue:r.issue, pages:r.pages, doi:r.doi, highlights:r.highlights.join('\n')}));
+}
+function blankSource(f){
+  return Object.assign({id:uid(), authors:[], year:'', title:'', container:'', volume:'', issue:'', pages:'', doi:'', highlights:''}, f || {});
+}
+function approxRect(it){
+  if(it.kind === 'card') return {x:it.x, y:it.y, w:CARD_W, h:CARD_H};
+  return {x:it.x, y:it.y, w:STACK_W, h:72 + 26 * cardsUnder(it.id).length};
+}
+function overlaps(a, b){ return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; }
+function freeSlot(kind){
+  const w = kind === 'card' ? CARD_W : STACK_W, h = kind === 'card' ? CARD_H : 90;
+  const xs = [], ys = [];
+  for(let x = 28; x <= UNSURE_X - w - 20; x += (kind === 'card' ? 236 : 262)) xs.push(x);
+  if(kind === 'card'){ for(let y = 28; y <= ARCHIVE_Y - h - 20; y += 128) ys.push(y); }
+  else { for(let y = ARCHIVE_Y - 200; y >= 28; y -= 150) ys.push(y); }
+  const placed = items().filter(i=>!(i.kind==='card' && i.under)).map(approxRect);
+  for(const y of ys) for(const x of xs){
+    const r = {x, y, w, h};
+    if(!placed.some(p=>overlaps(p, r))) return {x, y};
+  }
+  const n = items().length % 12;
+  return {x:60 + n*16, y:60 + n*16};
+}
+function syncCards(){
+  const parsed = state.sources.flatMap(s=>hlLines(s).map(t=>({source:s.id, text:t})));
+  const pool = {};
+  for(const c of items()) if(c.kind==='card' && !c.copyOf){ const k = c.source+'|'+c.text; (pool[k] = pool[k] || []).push(c); }
+  const keep = new Set(), fresh = [];
+  for(const p of parsed){
+    const k = p.source+'|'+p.text;
+    if(pool[k] && pool[k].length){ keep.add(pool[k].shift().id); }
+    else fresh.push(p);
+  }
+  state.canvas.items = items().filter(i => i.kind !== 'card' || (i.copyOf ? keep.has(i.copyOf) : keep.has(i.id)));
+  for(const p of fresh){
+    const s = freeSlot('card');
+    state.canvas.items.push({id:uid(), kind:'card', source:p.source, text:p.text, x:s.x, y:s.y, zone:'work', under:null, copyOf:null});
+  }
+  return {added:fresh.length, total:parsed.length};
+}
+function seedExample(){
+  if(state.canvas.seeded) return;
+  state.canvas.seeded = true;
+  if(!state.isExample) return;
+  const find = t => items().find(i=>i.kind==='card' && i.text.indexOf(t) === 0);
+  const b1 = {id:uid(), kind:'bubble', text:BN.notOnlyGrammar, x:40, y:700, zone:'work'};
+  items().push(b1);
+  const g = find('Supervisors report problems'), s = find('Students struggle');
+  if(g) g.under = b1.id; if(s) s.under = b1.id;
+  items().push({id:uid(), kind:'bubble', text:BN.noOneExplains, x:620, y:700, zone:'work'});
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render(){
+  document.body.dataset.phase = phaseOf(state.stage);
+  document.body.classList.toggle('wide', state.stage === 'map');
+  renderRail();
+  const views = {
+    purpose:renderPurpose, sources:renderSources, map:renderMap,
+    topics:()=>renderFocus('topics'), chunks:()=>renderFocus('chunks'), synthesis:()=>renderFocus('synthesis'),
+    logic:renderLogic, review:renderReview
+  };
+  main.innerHTML = views[state.stage]();
+  justRevealed = false;
+  justFiled = false;
+  rendered = true;
+  afterRender();
+}
+function renderRail(){
+  const i = stageIndex(state.stage);
+  $('#rail').innerHTML = STAGES.slice(0,i).map(s=>'<span class="rail-done">'+esc(s.name)+'</span>').join('') +
+    '<span class="rail-now" aria-current="step">'+esc(STAGES[i].name)+'</span>';
+}
+function head(eyebrow, h, lede){
+  return '<header class="stage-head"><p class="eyebrow">'+eyebrow+'</p><h1><span class="hl">'+h+'</span></h1><p class="lede">'+lede+'</p></header>';
+}
+function purposeReminder(){ return state.purpose.trim() ? '<p class="reminder"><span class="mini">Your purpose</span>'+esc(state.purpose)+'</p>' : ''; }
+function exampleFlag(what){
+  return state.isExample ? '<p class="example-flag">'+what+' Example learner’s first language: <b>'+esc(EXAMPLE_L1)+'</b>. Replace it with your own, or try the flow with it.</p>' : '';
+}
+
+function renderPurpose(){
+  return '<section class="stage">' +
+    head('Start here', 'What should your review answer?', 'Write the question or purpose in a sentence or two, in any language, and choose your citation style. Every later choice comes back to these.') +
+    '<div class="panel current morphable">' +
+      exampleFlag('Example content from your project’s readings.') +
+      '<label class="field-label" for="purpose-text">Purpose of this review</label>' +
+      '<textarea id="purpose-text" rows="3" data-track="purpose" placeholder="What do you want this review to find out?">'+esc(state.purpose)+'</textarea>' +
+    '</div>' +
+    '<div class="panel morphable">' +
+      '<fieldset class="styles"><legend>Citation style</legend>' +
+      '<p class="note" style="grid-column:1/-1">Choose the style your course, advisor or target journal asks for. Every citation you write in this outline follows it, so you practise it as you go.</p>' +
+      Object.keys(STYLES).map(k=>'<label class="style-opt" for="style-'+k+'"><span class="style-top"><input type="radio" name="cstyle" id="style-'+k+'" value="'+k+'" '+(state.citationStyle===k?'checked':'')+'> '+esc(STYLES[k].name)+'</span>' +
+        '<p class="style-use">'+esc(STYLES[k].use)+'</p>' + styleGuide(k) + '</label>').join('') +
+      '</fieldset>' +
+      '<div class="actions"><button class="primary morphable" type="button" data-act="to-sources" '+(state.purpose.trim() && state.citationStyle ? '' : 'disabled')+'>Bring in my sources →</button></div>' +
+    '</div></section>';
+}
+
+function sourceCount(){
+  const withHl = state.sources.filter(s=>hlLines(s).length);
+  return {n:withHl.reduce((a,s)=>a+hlLines(s).length,0), s:withHl.length};
+}
+function countText(){ const c = sourceCount(); return c.n+' highlight'+(c.n===1?'':'s')+' from '+c.s+' source'+(c.s===1?'':'s'); }
+function infoCardHTML(s, i){
+  const n = hlLines(s).length;
+  return '<article class="info-card morphable s'+(i%6)+'" data-sid="'+s.id+'">' +
+    '<div class="ic-cite" id="ic-'+s.id+'">'+citeBlock(s)+'</div>' +
+    editDetails(s, !sourceComplete(s)) +
+    '<label class="field-label" for="hl-'+s.id+'">What you highlighted, one per line</label>' +
+    '<textarea id="hl-'+s.id+'" rows="'+Math.max(3, n*2+1)+'" data-sfield="highlights" data-sid="'+s.id+'" data-track="highlights" placeholder="A sentence or idea from this source">'+esc(s.highlights)+'</textarea>' +
+    '<div class="ic-foot"><span class="count" id="hlc-'+s.id+'">'+n+' highlight'+(n===1?'':'s')+'</span>' +
+    '<button type="button" class="link-btn" data-act="rm-source" data-ref="'+s.id+'">Remove this source</button></div>' +
+  '</article>';
+}
+function renderSources(){
+  const st = STYLES[state.citationStyle];
+  return '<section class="stage">' +
+    head('Your sources', 'One card for each source.', 'Paste a reference you already have, from Google Scholar, Zotero or the article page, and a card fills itself in. Then add what you highlighted. Each card shows how to cite that source in '+esc(st.name)+'.') +
+    purposeReminder() +
+    '<div class="panel morphable"><h2 class="panel-title">How a '+esc(st.short)+' reference is built</h2>' + legendHTML() +
+      '<ul class="notes">' + st.refNotes.map(n=>'<li>'+esc(n)+'</li>').join('') + '</ul>' + guideDetails() + '</div>' +
+    exampleFlag('Example sources from your project’s readings.') +
+    '<div class="info-cards">' + state.sources.map(infoCardHTML).join('') + '</div>' +
+    '<div class="panel morphable"><label class="field-label" for="ref-paste">Add a source: paste its reference</label>' +
+      '<textarea id="ref-paste" rows="2" placeholder="Paste a reference, for example from Google Scholar’s “Cite” button"></textarea>' +
+      '<div class="talk-row"><button class="secondary morphable" type="button" data-act="add-ref">Make a card</button>' +
+      '<button class="ghost-btn" type="button" data-act="add-blank">Add a blank card</button></div></div>' +
+    '<div class="map-bar"><p class="count" id="source-count">'+countText()+'</p>' +
+    '<button class="primary morphable" type="button" data-act="to-map" '+(sourceCount().n?'':'disabled')+'>Lay out my highlights →</button></div>' +
+  '</section>';
+}
+
+function renderMap(){
+  return '<section class="stage">' +
+    '<div class="map-top"><div class="map-intro">' +
+    head('Source map', 'Look at your sources and say how they connect.',
+      'Talk about what the cards have in common, in any language. Each statement becomes a bubble. Drag a bubble onto the cards that support it and keep stacks that belong together close. Each framed block becomes a paragraph, so give it a name.') +
+    purposeReminder() + '</div>' +
+      '<div class="panel talk morphable">' +
+        '<div class="live-row">' +
+          '<button class="primary morphable" type="button" id="live-btn" data-act="live-toggle" aria-pressed="false">● Start talking</button>' +
+          '<label class="sr" for="live-lang">Speech language</label><select id="live-lang">' +
+            '<option value="en-US"'+(liveLang()==='en-US'?' selected':'')+'>English</option>' +
+            '<option value="bn-BD"'+(liveLang()==='bn-BD'?' selected':'')+'>বাংলা</option>' +
+            '<option value="zh-CN"'+(liveLang()==='zh-CN'?' selected':'')+'>中文</option></select>' +
+          '<button class="ghost-btn" type="button" data-act="sample-talk">Play a sample talk</button>' +
+        '</div>' +
+        '<p class="live-cap idle" id="live-cap" aria-live="polite">Talk while you look at the cards. Each sentence becomes a bubble, and cards you name get circled.</p>' +
+        '<details class="type-instead"><summary>Type or upload instead</summary>' +
+          '<label class="sr" for="talk-text">Say it in your own words</label>' +
+          '<textarea id="talk-text" rows="2" data-track="talk" data-prompt="map" placeholder="…"></textarea>' +
+          '<div class="talk-row">' +
+            '<button class="secondary morphable" type="button" data-act="add-bubbles">Add as bubble</button>' +
+            '<label class="ghost-btn" for="talk-file">Add a recording</label>' +
+            '<input type="file" id="talk-file" accept="audio/*,text/plain" hidden>' +
+            '<p class="note">Each sentence becomes its own bubble.</p>' +
+          '</div>' +
+        '</details>' +
+      '</div></div>' +
+    '<div class="map-grid">' +
+      '<div class="map-tools">' +
+        '<p class="count" id="map-count"></p>' +
+        '<div class="talk-row">' +
+          '<button class="ghost-btn" type="button" id="hint-toggle" aria-pressed="'+(state.canvas.hintsOn?'true':'false')+'">Faint hints</button>' +
+          '<div class="zoom" role="group" aria-label="Zoom the source map">' +
+            '<button class="icon-btn" type="button" data-zoom="out" aria-label="Zoom out">−</button>' +
+            '<output id="zoom-val" aria-live="polite">100%</output>' +
+            '<button class="icon-btn" type="button" data-zoom="in" aria-label="Zoom in">+</button>' +
+            '<button class="ghost-btn" type="button" data-zoom="fit">Fit to screen</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="board-wrap" id="board-wrap"><div class="board-sizer" id="board-sizer"><div class="board" id="board" aria-label="Source map" style="width:'+BW+'px;height:'+BH+'px"></div></div></div>' +
+      '<p class="board-hint">Each dashed frame is one block, and each block becomes a paragraph. Name a block in its frame, or drag ⠿ Move to move the whole block. Put what you are unsure of on the right and set aside what you will not use at the bottom. Drag a card off a bubble to unstack it; double-click a bubble to edit it.</p>' +
+    '</div>' +
+    '<div class="actions"><button class="primary morphable" type="button" data-act="map-done" id="map-done">Write topic sentences →</button></div></section>';
+}
+
+/* Zoom */
+function zoom(){ return state.canvas.zoom || 1; }
+function fitZoom(widthOnly){
+  const w = $('#board-wrap'); if(!w) return 1;
+  const zw = (w.clientWidth - 4) / BW, zh = (w.clientHeight - 4) / BH;
+  return clamp(widthOnly ? zw : Math.min(zw, zh), ZMIN, 1);
+}
+function applyZoom(z){
+  z = clamp(Math.round(z * 100) / 100, ZMIN, ZMAX);
+  state.canvas.zoom = z;
+  const sizer = $('#board-sizer'), board = $('#board'), out = $('#zoom-val');
+  if(sizer){ sizer.style.width = (BW * z) + 'px'; sizer.style.height = (BH * z) + 'px'; }
+  if(board) board.style.transform = 'scale(' + z + ')';
+  if(out) out.textContent = Math.round(z * 100) + '%';
+  save();
+}
+
+function markNames(text){
+  let html = esc(text);
+  for(const w of new Set(findMentions(text).values())) html = html.replace(new RegExp('(^|[^\\p{L}])(' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')(?=$|[^\\p{L}])','giu'), '$1<u>$2</u>');
+  return html;
+}
+function hlText(t){ return '<span class="hl">'+esc(t)+'</span>'; }
+const freshBubbles = [];
+let lastSnap = null;
+function renderBoard(){
+  const board = $('#board'); if(!board) return;
+  const free = items().filter(i=>i.kind==='card' && !i.under);
+  const bubbles = items().filter(i=>i.kind==='bubble');
+  let html = '<div class="zone unsure" style="left:'+UNSURE_X+'px;top:0;width:'+UNSURE_W+'px;height:'+ARCHIVE_Y+'px"><span class="zone-label">Not sure yet</span></div>' +
+             '<div class="zone archive" style="left:0;top:'+ARCHIVE_Y+'px;width:'+BW+'px;height:'+ARCHIVE_H+'px"><span class="zone-label">Set aside</span></div>' +
+             '<div id="hulls"></div><svg class="hints" id="hints" width="'+BW+'" height="'+BH+'" viewBox="0 0 '+BW+' '+BH+'" aria-hidden="true"></svg>';
+  for(const c of free){
+    html += '<div class="item card '+srcIndex(c.source)+(c.zone==='archive'?' in-archive':'')+'" data-id="'+c.id+'" data-kind="card" style="left:'+c.x+'px;top:'+c.y+'px" title="'+esc(c.text)+'">' +
+      '<span class="src">'+esc(citeOf(c.source))+'</span><p class="ctext">'+hlText(c.text)+'</p>' +
+      '<button type="button" class="mini-btn" data-act="copy-card" data-ref="'+c.id+'" aria-label="Copy this card" title="Copy this card">⧉</button></div>';
+  }
+  for(const b of bubbles){
+    const under = cardsUnder(b.id);
+    html += '<div class="item stack'+(b.zone==='archive'?' in-archive':'')+'" data-id="'+b.id+'" data-kind="bubble" style="left:'+b.x+'px;top:'+b.y+'px">' +
+      '<div class="bubble"><p class="btext" data-bid="'+b.id+'">'+markNames(b.text)+'</p>' +
+        '<span class="b-tools"><button type="button" class="mini-btn" data-act="edit-bubble" data-ref="'+b.id+'" aria-label="Edit bubble">✎</button>' +
+        '<button type="button" class="mini-btn" data-act="rm-bubble" data-ref="'+b.id+'" aria-label="Remove bubble">×</button></span></div>' +
+      (under.length ? '<ul class="under">' + under.map(c=>'<li class="chip-card '+srcIndex(c.source)+'" data-card-chip="'+c.id+'" title="'+esc(citeOf(c.source)+': '+c.text)+'"><b>'+esc(citeOf(c.source))+'</b> '+esc(c.text)+'</li>').join('') + '</ul>' : '') +
+    '</div>';
+  }
+  board.innerHTML = html;
+  drawHulls();
+  drawHints();
+  updateMapStatus();
+  applyMentions();
+  playFeedback(board);
+}
+function playFeedback(board){
+  if(freshBubbles.length){
+    freshBubbles.forEach((id, k)=>{ const el = board.querySelector('.item[data-id="'+id+'"] .bubble'); if(el) sparkle(el, k === 0); });
+    freshBubbles.length = 0;
+  }
+  if(lastSnap){
+    const bub = board.querySelector('.item[data-id="'+lastSnap.bubbleId+'"] .bubble');
+    const chip = board.querySelector('[data-card-chip="'+lastSnap.cardId+'"]');
+    if(bub && !reduceMotion()) bub.classList.add('clack');
+    if(chip && !reduceMotion()) chip.classList.add('snapped');
+    lastSnap = null;
+  }
+}
+
+/* Feedback 1: sparkle ring on a new bubble (only the first bubble of one utterance gets the full ring). */
+const STAR = '<svg viewBox="0 0 10 10" width="10" height="10"><path d="M5 0Q5 5 10 5Q5 5 5 10Q5 5 0 5Q5 5 5 0Z"/></svg>';
+function sparkle(el, full){
+  if(reduceMotion()) return;
+  el.classList.add(full ? 'pop' : 'pop-quiet');
+  if(!full) return;
+  const halo = document.createElement('span'); halo.className = 'halo'; el.appendChild(halo);
+  const W = el.offsetWidth, H = el.offsetHeight, n = 10;
+  for(let k=0;k<n;k++){
+    const a = k/n*2*Math.PI, s = document.createElement('span');
+    s.className = 'sp'; s.innerHTML = STAR;
+    s.style.left = (W/2 + Math.cos(a)*(W/2+2)) + 'px'; s.style.top = (H/2 + Math.sin(a)*(H/2+2)) + 'px';
+    s.style.setProperty('--dx', Math.cos(a)*14 + 'px'); s.style.setProperty('--dy', Math.sin(a)*12 + 'px');
+    s.style.setProperty('--s', k % 2 ? .7 : 1); s.style.animationDelay = (k % 2 ? 60 : 0) + 'ms';
+    el.appendChild(s);
+  }
+  setTimeout(()=>{ el.querySelectorAll('.sp,.halo').forEach(x=>x.remove()); el.classList.remove('pop'); }, 1150);
+}
+
+/* Feedback 2: a hand-drawn pencil loop around each card the learner names. */
+function drawLoop(el, delay, animate){
+  el.querySelectorAll(':scope > .loop').forEach(x=>x.remove());
+  const w = el.offsetWidth + 20, h = el.offsetHeight + 18, j = () => Math.random()*3 - 1.5;
+  const d = 'M'+(w*0.55)+' '+(2+j())+' C'+(w*0.95)+' '+j()+' '+(w+3)+' '+(h*0.25)+' '+(w-1)+' '+(h*0.55)+' C'+(w-3)+' '+(h+1)+' '+(w*0.3)+' '+(h+2)+' '+(4+j())+' '+(h*0.7)+' C-2 '+(h*0.4)+' '+(w*0.1)+' 1 '+(w*0.5)+' '+(4+j())+' L'+(w*0.66)+' 0';
+  const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'loop' + (animate ? '' : ' static'));
+  svg.setAttribute('width', w); svg.setAttribute('height', h); svg.setAttribute('viewBox', '0 0 '+w+' '+h); svg.setAttribute('aria-hidden', 'true');
+  svg.style.left = '-10px'; svg.style.top = '-9px';
+  const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); svg.appendChild(p); el.appendChild(svg);
+  const L = Math.ceil(p.getTotalLength ? p.getTotalLength() : 900);
+  p.style.setProperty('--L', L); p.style.setProperty('--d', delay + 'ms');
+}
+
+/* =========================================================
+   LIVE TALK: speech → bubbles, named sources get circled.
+   Runs in the browser with no model call in the loop.
+   ========================================================= */
+function liveLang(){ return state.canvas.liveLang || 'en-US'; }
+function fold(t){ return String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function lev(a, b){
+  const d = Array.from({length:b.length+1}, (_,j)=>j);
+  for(let i=1;i<=a.length;i++){ let prev = d[0]; d[0] = i;
+    for(let j=1;j<=b.length;j++){ const t = d[j]; d[j] = Math.min(d[j]+1, d[j-1]+1, prev + (a[i-1]===b[j-1]?0:1)); prev = t; } }
+  return d[b.length];
+}
+function nameKeys(){
+  const keys = [];
+  for(const s of state.sources) for(const a of authorsOf(s)){
+    const full = fold(a.last.trim());
+    keys.push({k:full, sid:s.id, fuzzy:full.replace(/\s/g,'').length >= 6, phrase:/\s/.test(full)});
+    if(/[\s-]/.test(full)) for(const part of full.split(/[\s-]+/)) if(part.length >= 4) keys.push({k:part, sid:s.id, fuzzy:false, phrase:false});
+  }
+  return keys;
+}
+/* Fuzzy matching tolerates small transcription slips in author names. Returns sid -> word as heard, in speaking order. */
+function findMentions(text){
+  const t = fold(text), words = t.match(/[a-z][a-z'-]*/g) || [], hits = [];
+  for(const key of nameKeys()){
+    let found = null;
+    if(key.phrase){ if(t.includes(key.k)) found = key.k; }
+    else for(const w of words){
+      if(w === key.k || (key.fuzzy && w.length >= 5 && lev(w, key.k) <= (key.k.length >= 8 ? 2 : 1))){ found = w; break; }
+    }
+    if(found && !hits.some(h=>h.sid===key.sid)) hits.push({sid:key.sid, word:found, at:t.indexOf(found)});
+  }
+  hits.sort((a,b)=>a.at - b.at);
+  return new Map(hits.map(h=>[h.sid, h.word]));
+}
+/* A loop stays until the learner names other sources. */
+const mentioned = new Map(); // sid -> {t, order}
+function noteMentions(text, via){
+  const hits = findMentions(text); if(!hits.size) return hits;
+  const now = Date.now(), ids = [...hits.keys()];
+  for(const sid of [...mentioned.keys()]) if(!hits.has(sid)) mentioned.delete(sid);
+  ids.forEach((sid, k)=>{
+    if(!mentioned.has(sid)){ mentioned.set(sid, {t:now, order:k}); Logger.log('mention', {sid, via}); }
+  });
+  applyMentions();
+  return hits;
+}
+function applyMentions(){
+  const board = $('#board'); if(!board) return;
+  const now = Date.now();
+  board.querySelectorAll('.item.card').forEach(el=>{
+    const c = itemById(el.dataset.id), m = c && mentioned.get(c.source);
+    el.classList.toggle('mentioned', !!m);
+    if(m){ if(!el.querySelector(':scope > .loop')) drawLoop(el, m.order * 250, now - m.t < 900); }
+    else el.querySelectorAll(':scope > .loop').forEach(x=>x.remove());
+  });
+  board.querySelectorAll('[data-card-chip]').forEach(el=>{ const c = itemById(el.dataset.cardChip); el.classList.toggle('mentioned', !!c && mentioned.has(c.source)); });
+}
+function showCaption(text, idle){
+  const cap = $('#live-cap'); if(!cap) return;
+  cap.classList.toggle('idle', !!idle);
+  if(idle){ cap.textContent = text; return; }
+  let html = esc(text);
+  for(const w of new Set(findMentions(text).values())) html = html.replace(new RegExp('(^|[^\\p{L}])(' + w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')(?=$|[^\\p{L}])','giu'), '$1<mark>$2</mark>');
+  cap.innerHTML = html || '…';
+}
+let utterStart = 0;
+function onInterim(text, via){
+  if(!utterStart && text.trim()) utterStart = Date.now();
+  showCaption(text); noteMentions(text, via);
+}
+function onFinal(text, via){
+  const statements = splitLocal(text);
+  if(state.stage !== 'map' || !statements.length) return;
+  noteMentions(text, via);
+  for(const t of statements){ const sl = freeSlot('bubble'); const id = uid(); items().push({id, kind:'bubble', text:t, x:sl.x, y:sl.y, zone:'work'}); freshBubbles.push(id); }
+  Logger.log('add_bubble', {via, n:statements.length, msSinceSpeechStart: utterStart ? Date.now() - utterStart : null});
+  utterStart = 0;
+  save(); renderBoard();
+  revealNewest();
+}
+function revealNewest(){
+  const id = freshBubbles[freshBubbles.length - 1] || null;
+  const it = items().filter(i=>i.kind==='bubble').at(-1), w = $('#board-wrap');
+  if(!it || !w) return;
+  const z = zoom(), x = it.x * z, y = it.y * z;
+  if(x < w.scrollLeft || x > w.scrollLeft + w.clientWidth - 120 || y < w.scrollTop || y > w.scrollTop + w.clientHeight - 80)
+    w.scrollTo({left:Math.max(0, x - 80), top:Math.max(0, y - 120), behavior: reduceMotion() ? 'auto' : 'smooth'});
+}
+let rec = null, liveOn = false;
+function setLiveUI(on){
+  const b = $('#live-btn'); if(!b) return;
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.textContent = on ? '■ Stop talking' : '● Start talking';
+}
+function stopLive(){
+  liveOn = false;
+  if(rec){ try{ rec.onend = null; rec.stop(); }catch(e){} rec = null; }
+  setLiveUI(false);
+}
+function startLive(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const unavailable = why => { stopLive(); Logger.log('live_unavailable', {why}); showCaption('Live speech is not available here (' + why + '). Use “Play a sample talk” to see how it works, or type instead.', true); };
+  if(!SR) return unavailable('this browser has no speech recognition');
+  try{
+    rec = new SR();
+    rec.lang = liveLang(); rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => {
+      let interim = '';
+      for(let i=e.resultIndex;i<e.results.length;i++){ const r = e.results[i]; if(r.isFinal) onFinal(r[0].transcript, 'speech'); else interim += r[0].transcript; }
+      if(interim) onInterim(interim, 'speech'); else showCaption('Listening…', true);
+    };
+    rec.onerror = ev => { if(['not-allowed','service-not-allowed','audio-capture','network'].includes(ev.error)) unavailable('microphone or speech service blocked'); };
+    rec.onend = () => { if(liveOn){ try{ rec.start(); }catch(e){ stopLive(); } } };
+    rec.start(); liveOn = true; setLiveUI(true); showCaption('Listening…', true);
+    Logger.log('live_start', {lang:rec.lang});
+  }catch(e){ unavailable('could not start'); }
+}
+/* Sample talk: the example learner moves between English and Bengali, as many L2 writers do. */
+const SAMPLE_TALK = ['Hawari and Lin both point to the same problem.', BN.talk, 'And Mehar Singh says what students learned at home does not match.'];
+let sampleRunning = false;
+async function playSampleTalk(){
+  if(sampleRunning) return; sampleRunning = true; stopLive();
+  const wait = ms => new Promise(r=>setTimeout(r, reduceMotion() ? 0 : ms));
+  Logger.log('sample_talk', {});
+  for(const line of SAMPLE_TALK){
+    const parts = /[一-鿿]/.test(line) ? line.match(/.{1,2}/gu) : line.split(' ');
+    let heard = '';
+    for(const p of parts){ if(state.stage !== 'map'){ sampleRunning = false; return; } heard += (heard && !/[一-鿿]/.test(p) ? ' ' : '') + p; onInterim(heard, 'sample'); await wait(170); }
+    await wait(350); onFinal(line, 'sample'); await wait(1200);
+  }
+  showCaption('Talk while you look at the cards. Each sentence becomes a bubble, and cards you name get circled.', true);
+  sampleRunning = false;
+}
+
+/* Geometry in board units (independent of zoom) */
+function relRect(el){
+  const board = $('#board'); if(!board || !el) return null;
+  const b = board.getBoundingClientRect(), r = el.getBoundingClientRect(), z = zoom();
+  return {x:(r.left - b.left)/z, y:(r.top - b.top)/z, w:r.width/z, h:r.height/z};
+}
+function stackGroups(){
+  const board = $('#board'); if(!board) return [];
+  const nodes = items().filter(i=>i.kind==='bubble' && i.zone==='work')
+    .map(b=>({b, r:relRect(board.querySelector('.item[data-id="'+b.id+'"]'))})).filter(n=>n.r);
+  const parent = nodes.map((_,i)=>i);
+  const root = i => parent[i]===i ? i : (parent[i] = root(parent[i]));
+  for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++){
+    const a = nodes[i].r, c = nodes[j].r;
+    const gx = Math.max(0, Math.max(a.x, c.x) - Math.min(a.x + a.w, c.x + c.w));
+    const gy = Math.max(0, Math.max(a.y, c.y) - Math.min(a.y + a.h, c.y + c.h));
+    if(gx <= LINK_GAP && gy <= LINK_GAP) parent[root(i)] = root(j);
+  }
+  const groups = {};
+  nodes.forEach((n,i)=>{ (groups[root(i)] = groups[root(i)] || []).push(n); });
+  return Object.values(groups);
+}
+function groupName(g){ const n = g.map(x=>x.b.theme).find(t=>t && t.trim()); return n || ''; }
+function drawHulls(){
+  const layer = $('#hulls'); if(!layer) return;
+  layer.innerHTML = stackGroups().map((g,k)=>{
+    const x0 = Math.max(0, Math.min(...g.map(n=>n.r.x)) - 14), y0 = Math.max(0, Math.min(...g.map(n=>n.r.y)) - 46);
+    const x1 = Math.max(...g.map(n=>n.r.x + n.r.w)) + 14, y1 = Math.max(...g.map(n=>n.r.y + n.r.h)) + 14;
+    const ids = g.map(n=>n.b.id).join(',');
+    return '<div class="hull" data-hull="'+ids+'" style="left:'+x0+'px;top:'+y0+'px;width:'+(x1-x0)+'px;height:'+(y1-y0)+'px">' +
+      '<div class="hull-head"><span class="hull-grip" data-theme-grip="'+ids+'" title="Move this block" role="button" aria-label="Move this block">⠿ Move</span>' +
+      '<label class="sr" for="hn-'+k+'">Theme name</label><input type="text" class="hull-name" id="hn-'+k+'" data-theme-ids="'+ids+'" data-track="theme" value="'+esc(groupName(g))+'" placeholder="Name this block"></div></div>';
+  }).join('');
+}
+let currentHints = [];
+function hintsUnlocked(){ return items().some(i=>i.kind==='card' && i.under); }
+async function drawHints(){
+  const svg = $('#hints'); if(!svg) return;
+  const toggle = $('#hint-toggle');
+  if(toggle){
+    toggle.disabled = !hintsUnlocked();
+    toggle.title = hintsUnlocked() ? 'Show faint lines between cards and bubbles that share a word' : 'Available after you stack your first card';
+  }
+  if(!state.canvas.hintsOn || !hintsUnlocked()){ svg.innerHTML = ''; currentHints = []; return; }
+  const bubbles = items().filter(i=>i.kind==='bubble' && i.zone==='work').map(b=>({id:b.id, text:b.text}));
+  const cards = items().filter(i=>i.kind==='card' && !i.under && i.zone!=='archive').map(c=>({id:c.id, source:c.source, text:c.text}));
+  const links = await ai('suggestLinks', {bubbles, cards});
+  currentHints = links;
+  const board = $('#board'); if(!board || !svg.isConnected) return;
+  svg.innerHTML = links.map(l=>{
+    const a = relRect(board.querySelector('.item[data-id="'+l.cardId+'"]'));
+    const b = relRect(board.querySelector('.item[data-id="'+l.bubbleId+'"] .bubble'));
+    if(!a || !b) return '';
+    const ax = a.x + a.w/2, ay = a.y + a.h/2, bx = b.x + b.w/2, by = b.y + b.h/2;
+    return '<line x1="'+ax+'" y1="'+ay+'" x2="'+bx+'" y2="'+by+'"/><text x="'+((ax+bx)/2+6)+'" y="'+((ay+by)/2-6)+'">both mention “'+esc(l.term)+'”</text>';
+  }).join('');
+}
+function updateMapStatus(){
+  const bubbles = items().filter(i=>i.kind==='bubble');
+  const stacked = items().filter(i=>i.kind==='card' && i.under).length;
+  const aside = items().filter(i=>i.zone==='archive' && !(i.kind==='card' && i.under)).length;
+  const el = $('#map-count');
+  if(el) el.textContent = bubbles.length + ' bubbles · ' + stacked + ' cards stacked · ' + aside + ' set aside';
+  const btn = $('#map-done');
+  if(btn) btn.disabled = !bubbles.some(b=>b.zone==='work');
+}
+
+/* Themes */
+function buildParagraphs(){
+  const groups = stackGroups()
+    .map(g=>({g, x:Math.min(...g.map(n=>n.r.x)), y:Math.min(...g.map(n=>n.r.y))}))
+    .sort((a,b)=> (Math.round(a.y/160) - Math.round(b.y/160)) || (a.x - b.x));
+  const old = state.paragraphs, used = new Set(), prev = {};
+  old.forEach(p=>p.points.forEach((pt,k)=>{ prev[pt.bubbleId] = {purposeId:pt.purposeId || '', purposeNote:pt.purposeNote || '', link:pt.link || '', k}; }));
+  state.paragraphs = groups.map(({g})=>{
+    const ids = g.map(n=>n.b.id);
+    let best = null, bestN = 0;
+    for(const p of old){ if(used.has(p.id)) continue; const n = p.points.filter(pt=>ids.includes(pt.bubbleId)).length; if(n > bestN){ best = p; bestN = n; } }
+    if(best) used.add(best.id);
+    const base = best ? best : {id:uid(), label:'', topic:'', synthesis:'', link:'', marks:[]};
+    const named = groupName(g);
+    /* Chunk order: the learner's earlier order where it exists, otherwise top-to-bottom, left-to-right on the map. */
+    const pts = g.slice().sort((a,b)=>{
+      const pa = prev[a.b.id], pb = prev[b.b.id];
+      if(best && pa && pb) return pa.k - pb.k;
+      return (a.r.y - b.r.y) || (a.r.x - b.r.x);
+    }).map(n=>{
+      const was = prev[n.b.id] || {};
+      return {bubbleId:n.b.id, text:n.b.text,
+        cards:cardsUnder(n.b.id).map(c=>({id:c.id, source:c.source, text:c.text})),
+        purposeId:was.purposeId || '', purposeNote:was.purposeNote || '', link:was.link || ''};
+    });
+    if(pts[0]) pts[0].link = '';
+    return Object.assign({}, base, {points:pts}, named ? {label:named} : {});
+  });
+  Logger.log('themes_built', {n:state.paragraphs.length});
+}
+function ptMeta(pt, k){
+  const link = k > 0 && pt.link ? relName(pt.link) : '', purp = purposeLabel(pt);
+  if(!link && !purp) return '';
+  return '<span class="pt-meta">' + (link ? '<span class="pt-link">'+esc(link)+'</span>' : '') + (purp ? '<span class="pill alt">'+esc(purp)+'</span>' : '') + '</span>';
+}
+function pointsView(p){
+  return '<ul class="points">' + p.points.map((pt,k) =>
+    '<li class="point">' + ptMeta(pt, k) + '<p class="pt-text">'+esc(pt.text)+'</p>' + srcChips(pt.cards) + '</li>').join('') + '</ul>';
+}
+function phrasesHTML(id){
+  const r = RELATIONS.find(x=>x.id===id);
+  if(!r) return 'Pick a relation. Signal phrases for later drafting appear here.';
+  return '<span class="mini">Signal phrases for when you draft</span>' + r.phrases.map(x=>'<i>'+esc(x)+'</i>').join(' · ');
+}
+function pick(name, value, data, key, checked, label){
+  return '<label class="pick"><input type="radio" name="'+name+'" value="'+value+'" '+data+'="'+key+'" '+(checked?'checked':'')+'><span>'+esc(label)+'</span></label>';
+}
+function linkRow(p, pt, k){
+  const key = p.id+'|'+pt.bubbleId;
+  return '<li class="link-row"><fieldset class="picks"><legend>How chunk '+(k+1)+' links to chunk '+k+'</legend>' +
+    RELATIONS.map(r=>pick('ln-'+pt.bubbleId, r.id, 'data-clink', key, pt.link===r.id, r.name)).join('') + '</fieldset>' +
+    '<p class="phrases" id="ph-'+pt.bubbleId+'">'+phrasesHTML(pt.link)+'</p></li>';
+}
+function chunkEditor(p){
+  const n = p.points.length;
+  return '<ol class="chunks">' + p.points.map((pt,k)=>{
+    const key = p.id+'|'+pt.bubbleId;
+    const mv = d => '<button type="button" class="icon-btn" data-act="chunk-move" data-dir="'+d+'" data-pid="'+p.id+'" data-ref="'+pt.bubbleId+'" '+((d<0 ? k===0 : k===n-1)?'disabled':'')+' aria-label="Move chunk '+(k+1)+(d<0?' up':' down')+'">'+(d<0?'↑':'↓')+'</button>';
+    return (k > 0 ? linkRow(p, pt, k) : '') +
+      '<li class="chunk">' +
+        '<div class="chunk-head"><span class="o-num">'+(k+1)+'</span><p class="pt-text">'+esc(pt.text)+'</p>' +
+          (n > 1 ? '<span class="move">'+mv(-1)+mv(1)+'</span>' : '') + '</div>' +
+        srcChips(pt.cards) +
+        '<fieldset class="picks"><legend>What this chunk does</legend>' +
+          PURPOSES.map(u=>pick('pp-'+pt.bubbleId, u.id, 'data-cpurpose', key, pt.purposeId===u.id, u.name)).join('') + '</fieldset>' +
+        '<label class="sr" for="cn-'+pt.bubbleId+'">What this chunk does, in your own words</label>' +
+        '<input type="text" class="content cnote" id="cn-'+pt.bubbleId+'" data-cnote="'+key+'" data-pid="'+p.id+'" data-track="chunk-note" value="'+esc(pt.purposeNote || '')+'" placeholder="…or in your own words, any language">' +
+      '</li>';
+  }).join('') + '</ol>';
+}
+function hasPurpose(pt){ return !!(pt.purposeId || String(pt.purposeNote || '').trim()); }
+function chunksReady(p){ return p.points.every((pt,k)=>hasPurpose(pt) && (k === 0 || !!pt.link)); }
+function chunkStatus(p){
+  const n = p.points.length, purposed = p.points.filter(hasPurpose).length, linked = p.points.slice(1).filter(pt=>pt.link).length;
+  return purposed+' of '+n+' chunk'+(n===1?'':'s')+' have a purpose' + (n > 1 ? ' · '+linked+' of '+(n-1)+' link'+(n===2?'':'s')+' named' : '');
+}
+function updateChunkStatus(p){ const el = $('#chunk-status'); if(el && p) el.textContent = chunkStatus(p); }
+
+/* Focus stages: one paragraph at a time, finished ones frosted */
+const FOCUS = {
+  topics:   {eyebrow:'Topic sentences', h:'One theme at a time.', lede:'Write the one sentence this paragraph stands on: what do these sources say together? Finished paragraphs are filed away.', frost:p=>p.topic},
+  chunks:   {eyebrow:'Chunks & links', h:'Set the paragraph’s structure.', lede:'Each bubble you stacked is a chunk of this paragraph. Put the chunks in order, say what each one does, and how each one links to the one before it. Structure only: you write the sentences later, when you draft.', frost:p=>p.points.map(purposeLabel).filter(Boolean).join(' → ')},
+  synthesis:{eyebrow:'Your synthesis', h:'What does this paragraph add up to?', lede:'Say what these sources show together that none of them says alone. This is your own reading, the part a reader cannot find in any one source. A sentence or two, in any language.', frost:p=>p.synthesis}
+};
+/* Each paragraph is one folder. It gains a sheet each time one of its steps is filed,
+   so folders thicken from topic sentence to chunks & links to synthesis. */
+const FOCUS_ORDER = ['topics','chunks','synthesis'];
+function cabinetHTML(mode, i){
+  const ps = state.paragraphs, base = FOCUS_ORDER.indexOf(mode), f = FOCUS[mode];
+  const filed = ps.map((d,j)=>({d, j, sheets: base + (j < i ? 1 : 0)})).filter(x=>x.j !== i && x.sheets > 0);
+  const latest = x => x.sheets >= 3 ? x.d.synthesis : x.sheets === 2 ? FOCUS.chunks.frost(x.d) : x.d.topic;
+  return '<div class="cabinet">' +
+      '<div class="drawer" aria-hidden="true">' + filed.map(x=>'<div class="ftab s'+Math.min(3,x.sheets)+(justFiled && x.j === i-1 ? ' new' : '')+'" title="'+esc(x.d.label)+'"><span>'+esc(x.d.label)+'</span></div>').join('') + '</div>' +
+      '<div class="cab-front'+(justFiled ? ' settle' : '')+'"><span class="holder">'+esc(f.eyebrow)+' · <b>'+i+'</b> filed</span><span class="handle"></span></div>' +
+      '<div class="cab-body"></div>' +
+    '</div>' +
+    (filed.length
+      ? (CONFIG.allowPeek ? '<button type="button" class="ghost-btn" data-peek>Hold to open the drawer</button>' : '') +
+        '<ul class="cab-peek">' + filed.map(x=>'<li><b>'+esc(x.d.label)+'</b><span>'+esc(latest(x) || '')+'</span></li>').join('') + '</ul>'
+      : '<p class="stack-note">Each finished paragraph is filed here.</p>');
+}
+function focusReady(mode, p){
+  if(mode==='topics') return !!p.topic.trim();
+  if(mode==='chunks') return chunksReady(p);
+  return !!String(p.synthesis || '').trim();
+}
+function renderFocus(mode){
+  const f = FOCUS[mode], ps = state.paragraphs;
+  const i = Math.min(state.cursor, ps.length-1);
+  const p = ps[i];
+  const stack = cabinetHTML(mode, i);
+  const topicReminder = '<p class="reminder"><span class="mini">Your topic sentence</span>'+esc(p.topic)+'</p>';
+  let body = '<p class="group-name">'+esc(p.label)+'</p>';
+  if(mode==='topics'){
+    body += pointsView(p) +
+      '<label class="field-label" for="f-topic-'+p.id+'">Topic sentence</label>' +
+      '<textarea id="f-topic-'+p.id+'" rows="2" data-bind="topic" data-pid="'+p.id+'" data-track="topic" data-prompt="topics" placeholder="…">'+esc(p.topic)+'</textarea>';
+  } else if(mode==='chunks'){
+    body += topicReminder + chunkEditor(p) + '<p class="chunk-status" id="chunk-status" aria-live="polite">'+esc(chunkStatus(p))+'</p>';
+  } else {
+    body += topicReminder + pointsView(p) +
+      '<label class="field-label" for="f-synthesis-'+p.id+'">Your synthesis</label>' +
+      '<textarea id="f-synthesis-'+p.id+'" rows="3" data-bind="synthesis" data-pid="'+p.id+'" data-track="synthesis" data-prompt="synthesis" placeholder="…">'+esc(p.synthesis || '')+'</textarea>';
+  }
+  return '<section class="stage">' + head(f.eyebrow, f.h, f.lede) +
+    '<div class="focus">' +
+      '<aside class="stack-wrap" aria-label="Filed paragraphs">'+stack+'</aside>' +
+      '<div class="panel current morphable'+(justFiled ? ' enter' : '')+'">' + body +
+        '<div class="actions">' + (mode==='topics' && i===0 ? '<button class="secondary morphable" type="button" data-act="back-map">Back to the map</button>' : '') +
+        '<button class="primary morphable" type="button" data-act="focus-next" data-mode="'+mode+'" '+(focusReady(mode,p)?'':'disabled')+'>Done with this paragraph</button></div>' +
+      '</div></div></section>';
+}
+
+const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
+function roman(n){ return ROMAN[n-1] || String(n); }
+function letter(k){ return String.fromCharCode(65 + k); }
+function citesOf(pt){
+  const seen = []; pt.cards.forEach(c=>{ if(!seen.includes(c.source)) seen.push(c.source); });
+  return seen.length ? '(' + seen.map(sid=>stripParens(citeOf(sid))).join('; ') + ')' : '';
+}
+/* The outline as it will guide drafting: Roman numerals for paragraphs, letters for chunks,
+   each chunk's purpose and its link to the chunk before. No prose is generated. */
+function outlinePoints(p){
+  return '<ol class="o-points">' + p.points.map((pt,k)=>
+    (k > 0 ? '<li class="o-link">↳ '+esc(relName(pt.link) || 'No relation named')+'</li>' : '') +
+    '<li class="o-point"><span class="o-letter">'+letter(k)+'.</span><span><span class="o-purpose">['+esc(purposeLabel(pt) || 'No purpose yet')+']</span> '+esc(pt.text)+' '+esc(citesOf(pt))+'</span></li>').join('') + '</ol>';
+}
+function outlineCard(p, i, n, opts){
+  opts = opts || {};
+  return '<article class="o-card morphable" style="--i:'+i+'">' +
+    '<div class="o-top"><span class="o-num">'+roman(i+1)+'.</span><h2 class="o-label">'+esc(p.label)+'</h2>' +
+      (opts.move ? '<span class="move"><button type="button" class="icon-btn" data-act="up" data-pid="'+p.id+'" '+(i===0?'disabled':'')+' aria-label="Move paragraph up">↑</button>' +
+        '<button type="button" class="icon-btn" data-act="down" data-pid="'+p.id+'" '+(i===n-1?'disabled':'')+' aria-label="Move paragraph down">↓</button></span>' : '') +
+    '</div>' +
+    '<p class="o-topic"><span class="o-lab">Topic sentence.</span> '+esc(p.topic)+'</p>' + outlinePoints(p) +
+    (p.synthesis ? '<p class="o-close"><span class="o-lab">Synthesis.</span> '+esc(p.synthesis)+'</p>' : '') +
+  '</article>';
+}
+/* Paragraph links mirror chunk links: each paragraph stores its relation to the paragraph above (p.link). */
+function paraLinkRow(q, k){
+  return '<div class="connector"><fieldset class="picks"><legend>How paragraph '+roman(k+1)+' links to paragraph '+roman(k)+'</legend>' +
+    RELATIONS.map(r=>pick('pl-'+q.id, r.id, 'data-plink', q.id, q.link===r.id, r.name)).join('') + '</fieldset>' +
+    '<p class="phrases" id="php-'+q.id+'">'+phrasesHTML(q.link)+'</p></div>';
+}
+function paperHead(){
+  return '<p class="pg" aria-hidden="true">1</p><p class="paper-title">Literature Review Outline</p>' +
+    (state.purpose.trim() ? '<p class="paper-purpose"><span class="o-lab">Purpose.</span> '+esc(state.purpose)+'</p>' : '');
+}
+function renderLogic(){
+  const ps = state.paragraphs;
+  return '<section class="stage'+(justRevealed?' reveal':'')+'">' +
+    head('Order & conclusion', 'Your whole outline.', 'Put the paragraphs in the order you want, name how each one links to the one before, and say where the review lands. This is still an outline: you write the full text later.') +
+    '<div class="paper">' + paperHead() +
+      '<ol class="outline">' + ps.map((p,i)=>'<li class="o-item">' + (i > 0 ? paraLinkRow(p, i) : '') + outlineCard(p,i,ps.length,{move:true}) + '</li>').join('') + '</ol>' +
+      '<div class="paper-landing"><label class="field-label" for="f-conclusion">Where your review lands: the gap or question it points to</label>' +
+        '<textarea id="f-conclusion" rows="3" data-global="conclusion" data-track="conclusion" data-prompt="conclusion" placeholder="…">'+esc(state.conclusion)+'</textarea></div>' +
+    '</div>' +
+    '<p class="rv-break">Next you review your own outline. It works best after a break, for example the next day, so you read it as a reader would.</p>' +
+    '<div class="actions"><button class="primary morphable" type="button" data-act="to-review">Review &amp; revise</button></div></section>';
+}
+
+/* =========================================================
+   REVIEW & REVISE
+   1 Mark (point): the learner marks anything that feels off, at any level.
+   2 Trace (line): for each mark, the tool lists the decisions connected to that spot by position.
+     The learner picks the one that led there and says what they did and why. No inference, no judgment.
+   3 Required decisions (whole): four global decisions every learner talks through, however many paragraphs.
+   4 Revise in the same structural editor.
+   ========================================================= */
+const FLAG_KINDS = [{id:'wording',name:'Wording'},{id:'sentence',name:'A sentence'},{id:'structure',name:'How parts fit'},{id:'unsure',name:'Not sure'}];
+function kindName(id){ return (FLAG_KINDS.find(k=>k.id===id) || {name:'Not sure'}).name; }
+const GLOBALS = [
+  {id:'landing',   name:'Where the review lands',             ask:'Why does your review land here?'},
+  {id:'blocks',    name:'How you split it into paragraphs',   ask:'Is each paragraph about one theme? Why did you group the chunks this way?'},
+  {id:'flow',      name:'Paragraph order and links',          ask:'Why this order, and why these links between paragraphs?'},
+  {id:'tradeoffs', name:'What you left out',                  ask:'Why did you set these aside, or leave them unsure?'}
+];
+/* Decisions at the whole-review level, for the research log. */
+const GLOBAL_DECISIONS = new Set(['landing','block','flow','plink','tradeoffs']);
+let openFlag = null;
+function rv(){ if(!state.review) state.review = {flags:[], globals:{}}; if(!state.review.globals) state.review.globals = {}; return state.review; }
+function flowText(){ return state.paragraphs.map((p,i)=>(i ? '→ '+(relName(p.link) || 'no link')+' → ' : '')+roman(i+1)+'. '+p.label).join(' '); }
+function leftOut(){ return items().filter(i=>(i.zone==='archive' || i.zone==='unsure') && !(i.kind==='card' && i.under)); }
+function tradeoffText(){ const n = leftOut(); return n.length ? n.length+' item'+(n.length===1?'':'s')+' set aside or unsure' : 'Nothing set aside'; }
+function purposesText(p){ return p.points.map((pt,k)=>letter(k)+'. '+(purposeLabel(pt) || '—')).join(' · '); }
+function linksText(p){ return p.points.slice(1).map((pt,k)=>letter(k)+'→'+letter(k+1)+' '+(relName(pt.link) || '—')).join(' · ') || 'Only one chunk'; }
+function parseKey(key){
+  const [kind, pid, bid] = key.split(':'), ps = state.paragraphs, i = ps.findIndex(p=>p.id===pid), p = ps[i];
+  const k = p && bid ? p.points.findIndex(x=>x.bubbleId===bid) : -1;
+  return {kind, p, i, k, pt: k >= 0 ? p.points[k] : null};
+}
+function spotOf(key){
+  const {kind, p, i, k, pt} = parseKey(key);
+  if(kind === 'landing') return {where:'Where the review lands', text:state.conclusion};
+  if(!p) return {where:'A part you have since removed', text:''};
+  const P = 'Paragraph '+roman(i+1);
+  if(kind === 'block') return {where:P+', the paragraph as a whole', text:p.label};
+  if(kind === 'topic') return {where:P+', topic sentence', text:p.topic};
+  if(kind === 'synth') return {where:P+', synthesis', text:p.synthesis};
+  if(kind === 'plink') return {where:'Link into '+P, text:relName(p.link) || 'No relation named'};
+  if(!pt) return {where:P+', a chunk you have since removed', text:''};
+  if(kind === 'clink') return {where:P+', link into chunk '+letter(k), text:relName(pt.link) || 'No relation named'};
+  return {where:P+', chunk '+letter(k), text:pt.text};
+}
+function decisionsFor(key){
+  const {kind, p, i, k, pt} = parseKey(key), out = [], ps = state.paragraphs;
+  const add = (id, label, detail) => out.push({id, label, detail:detail || '—'});
+  const block = () => add('block', 'How you grouped this paragraph on the source map', p.points.length+' chunk'+(p.points.length===1?'':'s')+' under “'+p.label+'”');
+  if(kind === 'landing'){
+    add('landing', 'Where the review lands', state.conclusion);
+    add('flow', 'Paragraph order and links', flowText());
+    add('tradeoffs', 'What you set aside or left unsure', tradeoffText());
+  } else if(!p){
+  } else if(kind === 'block'){
+    block(); add('label', 'The paragraph name', p.label); add('tradeoffs', 'What you set aside or left unsure', tradeoffText());
+  } else if(kind === 'topic'){
+    add('topic', 'The topic sentence you wrote', p.topic); block(); add('purposes', 'What each chunk does', purposesText(p));
+  } else if(kind === 'synth'){
+    add('synthesis', 'The synthesis you wrote', p.synthesis); add('purposes', 'What each chunk does', purposesText(p)); add('links', 'The links between chunks', linksText(p));
+  } else if(kind === 'plink'){
+    add('plink', 'The relation you chose', relName(p.link)); add('flow', 'Paragraph order', flowText());
+    add('topics', 'The topic sentences on both sides', (ps[i-1] ? ps[i-1].topic : '')+'  /  '+p.topic);
+  } else if(pt && kind === 'clink'){
+    const prev = p.points[k-1];
+    add('clink', 'The relation you chose', relName(pt.link)); add('corder', 'The order of the chunks', p.points.map((x,j)=>letter(j)).join(' → '));
+    add('purpose2', 'What the two chunks do', (prev ? purposeLabel(prev) : '—')+'  /  '+(purposeLabel(pt) || '—'));
+  } else if(pt){
+    add('purpose', 'What this chunk does', purposeLabel(pt)); add('stack', 'Which sources you stacked under it', citesOf(pt));
+    if(k > 0) add('clink', 'Its link to the chunk before', relName(pt.link));
+    if(p.points[k+1]) add('clinkNext', 'The link from it to the next chunk', relName(p.points[k+1].link));
+    add('corder', 'The order of the chunks', p.points.map((x,j)=>letter(j)).join(' → ')); block();
+  }
+  add('wording', 'Only the wording', 'How you put it, not what you decided');
+  return out;
+}
+function rvRow(key, cls, inner){
+  const flags = rv().flags.filter(f=>f.key===key);
+  return '<div class="rv-row '+cls+(flags.length ? ' flagged' : '')+'"><div class="rv-text">'+inner+'</div>' +
+      '<button type="button" class="flag-btn" data-act="flag-open" data-key="'+esc(key)+'" aria-label="Mark a problem: '+esc(spotOf(key).where)+'">Mark</button></div>' +
+    flags.map(f=>'<p class="flag-note"><span class="pill alt">'+esc(kindName(f.kind))+'</span><span>'+esc(f.note)+'</span><button type="button" class="link-btn" data-act="flag-rm" data-ref="'+f.id+'">Remove</button></p>').join('') +
+    (openFlag === key ? flagForm(key) : '');
+}
+function flagForm(key){
+  return '<div class="flag-form" role="group" aria-label="Mark a problem">' +
+    '<fieldset class="picks"><legend>What feels off</legend>' + FLAG_KINDS.map(k=>pick('fk', k.id, 'data-fk', key, false, k.name)).join('') + '</fieldset>' +
+    '<label class="field-label" for="flag-note">What feels wrong here? Any language.</label>' +
+    '<textarea id="flag-note" rows="2" data-track="flag-note" placeholder="…"></textarea>' +
+    '<p class="err" id="flag-err" hidden>Write a few words about what feels wrong.</p>' +
+    '<div class="talk-row"><button type="button" class="secondary" data-act="flag-save" data-key="'+esc(key)+'">Save mark</button>' +
+    '<button type="button" class="ghost-btn" data-act="flag-cancel">Cancel</button></div></div>';
+}
+function reviewOutline(){
+  let h = paperHead();
+  state.paragraphs.forEach((p,i)=>{
+    if(i > 0) h += rvRow('plink:'+p.id, 'rv-plink', '↓ '+esc(relName(p.link) || 'No relation named'));
+    h += rvRow('block:'+p.id, 'rv-head', '<b>'+roman(i+1)+'. '+esc(p.label)+'</b>');
+    h += rvRow('topic:'+p.id, 'rv-topic', '<span class="rv-lab">Topic sentence.</span> '+esc(p.topic));
+    p.points.forEach((pt,k)=>{
+      if(k > 0) h += rvRow('clink:'+p.id+':'+pt.bubbleId, 'rv-clink', '↳ '+esc(relName(pt.link) || 'No relation named'));
+      h += rvRow('chunk:'+p.id+':'+pt.bubbleId, 'rv-chunk', '<span class="rv-letter">'+letter(k)+'.</span><span class="rv-purpose">['+esc(purposeLabel(pt) || 'No purpose yet')+']</span> '+esc(pt.text)+' '+esc(citesOf(pt)));
+    });
+    h += rvRow('synth:'+p.id, 'rv-synth', '<span class="rv-lab">Synthesis.</span> '+esc(p.synthesis || ''));
+  });
+  h += rvRow('landing', 'rv-landing', '<b>Where the review lands.</b> '+esc(state.conclusion || ''));
+  return h;
+}
+function traceList(){
+  const R = rv();
+  if(!R.flags.length) return '<p class="stack-empty">The marks you add in step 1 appear here.</p>';
+  return '<ol class="traces">' + R.flags.map(f=>{
+    const sp = spotOf(f.key), ds = decisionsFor(f.key), tr = f.trace || {decision:'', why:''};
+    return '<li class="trace"><span class="mini">'+esc(sp.where)+' · '+esc(kindName(f.kind))+'</span>' +
+      '<p class="trace-quote">'+esc(sp.text || '—')+'</p><p class="trace-note">Your mark: '+esc(f.note)+'</p>' +
+      '<fieldset class="dec-picks"><legend>Which of your decisions led here?</legend>' +
+        ds.map(d=>'<label class="dec"><input type="radio" name="tr-'+f.id+'" value="'+d.id+'" data-trace="'+f.id+'" '+(tr.decision===d.id?'checked':'')+'><span><b>'+esc(d.label)+'</b><i>'+esc(d.detail)+'</i></span></label>').join('') +
+        '<label class="dec"><input type="radio" name="tr-'+f.id+'" value="none" data-trace="'+f.id+'" '+(tr.decision==='none'?'checked':'')+'><span><b>None of these, or not sure</b></span></label>' +
+      '</fieldset>' +
+      '<label class="field-label" for="tw-'+f.id+'">What did you decide then, and why? Any language.</label>' +
+      '<textarea id="tw-'+f.id+'" rows="2" data-tracewhy="'+f.id+'" data-track="trace-why" placeholder="…">'+esc(tr.why)+'</textarea></li>';
+  }).join('') + '</ol>';
+}
+function globalShow(id){
+  const ps = state.paragraphs;
+  if(id === 'landing') return esc(state.conclusion || 'Not written yet.');
+  if(id === 'blocks') return '<ul class="gl-list">' + ps.map((p,i)=>'<li><b>'+roman(i+1)+'. '+esc(p.label)+'</b>: '+p.points.map(pt=>esc(pt.text)).join(' · ')+'</li>').join('') + '</ul>';
+  if(id === 'flow') return '<div class="gl-flow">' + ps.map((p,i)=>(i ? '<span class="gl-rel">'+esc(relName(p.link) || 'no link named')+'</span>' : '')+'<span>'+roman(i+1)+'. '+esc(p.label)+'</span>').join('') + '</div>';
+  const n = leftOut();
+  if(!n.length) return 'Nothing set aside or left unsure.';
+  return '<ul class="gl-list">' + n.map(it=>'<li><span class="pill alt">'+(it.zone==='archive' ? 'Set aside' : 'Not sure')+'</span> '+(it.kind==='card' ? esc(citeOf(it.source))+' ' : '')+esc(it.text)+'</li>').join('') + '</ul>';
+}
+/* Keep can be confirmed with one choice; Change needs a reason. */
+function globalDone(id){ const v = rv().globals[id] || {}; return v.choice === 'keep' || (v.choice === 'change' && !!String(v.why || '').trim()); }
+function globalStatus(id){
+  const v = rv().globals[id] || {};
+  if(v.choice === 'keep') return 'Kept.';
+  if(v.choice === 'change') return String(v.why || '').trim() ? 'Make the change in step 4.' : 'Say why you will change it.';
+  return 'Not discussed yet.';
+}
+function globalsHTML(){
+  return '<div class="globals">' + GLOBALS.map(g=>{
+    const v = rv().globals[g.id] || {};
+    return '<article class="global'+(globalDone(g.id)?' done':'')+'" id="gl-'+g.id+'"><h3 class="panel-title">'+esc(g.name)+'</h3>' +
+      '<div class="global-show">'+globalShow(g.id)+'</div>' +
+      '<label class="field-label" for="gw-'+g.id+'">'+esc(g.ask)+'</label>' +
+      '<textarea id="gw-'+g.id+'" rows="2" data-global-why="'+g.id+'" data-track="global-why" placeholder="…">'+esc(v.why || '')+'</textarea>' +
+      '<fieldset class="picks"><legend>Keep it or change it?</legend>' + pick('gc-'+g.id, 'keep', 'data-gchoice', g.id, v.choice==='keep', 'Keep') + pick('gc-'+g.id, 'change', 'data-gchoice', g.id, v.choice==='change', 'Change it') + '</fieldset>' +
+      '<p class="note gl-status" id="gs-'+g.id+'">'+esc(globalStatus(g.id))+'</p></article>';
+  }).join('') + '</div>';
+}
+function reviewStatus(){
+  const R = rv(), traced = R.flags.filter(f=>f.trace && f.trace.decision).length, done = GLOBALS.filter(g=>globalDone(g.id)).length;
+  return R.flags.length+' mark'+(R.flags.length===1?'':'s')+' · '+traced+' traced · '+done+' of '+GLOBALS.length+' required decisions discussed';
+}
+function updateReviewStatus(){ const el = $('#rv-status'); if(el) el.textContent = reviewStatus(); }
+function updateGlobal(id){
+  const card = $('#gl-'+id); if(card) card.classList.toggle('done', globalDone(id));
+  const st = $('#gs-'+id); if(st) st.textContent = globalStatus(id);
+  updateReviewStatus();
+}
+function step(n, title, note){
+  return '<header class="rv-step"><span class="rv-n" aria-hidden="true">'+n+'</span><div><h2 class="panel-title">Step '+n+'. '+title+'</h2><p class="note">'+note+'</p></div></header>';
+}
+function rfield(key, p, label, rows){
+  return '<label class="field-label" for="rv-'+key+'-'+p.id+'">'+label+'</label>' +
+    '<textarea id="rv-'+key+'-'+p.id+'" rows="'+(rows||2)+'" data-bind="'+key+'" data-pid="'+p.id+'" data-track="'+key+'">'+esc(p[key] || '')+'</textarea>';
+}
+function renderReview(){
+  const ps = state.paragraphs, n = ps.length;
+  return '<section class="stage">' +
+    head('Review & revise', 'Find what feels off, then trace it back.', 'Read your outline as a reader would. This is the one place for judging it: earlier screens only asked you to decide.') +
+    step(1, 'Mark what feels off', 'Read the whole outline. Press Mark beside anything that feels wrong, at any level: a word, a sentence, or how the parts fit.') +
+    '<div class="paper rv-paper">' + reviewOutline() + '</div>' +
+    step(2, 'Trace each mark to a decision', 'For each mark, these are the decisions connected to that spot. Pick the one that led there, then say what you did and why.') +
+    traceList() +
+    step(3, 'Talk through the four big decisions', 'Every review rests on these four, whatever you marked. Say why you made each one, then keep it or change it.') +
+    globalsHTML() +
+    step(4, 'Revise', 'Make your changes here, in the same structure. To regroup paragraphs, go back to the source map; your work is kept.') +
+    '<ol class="outline rv-edit">' + ps.map((p,i)=>'<li class="o-item">' + (i > 0 ? paraLinkRow(p, i) : '') + '<article class="o-card edit">' +
+      '<div class="o-top"><span class="o-num">'+(i+1)+'</span><label class="sr" for="rl-'+p.id+'">Paragraph name</label>' +
+        '<input type="text" class="group-label content" id="rl-'+p.id+'" data-bind="label" data-pid="'+p.id+'" data-track="label" value="'+esc(p.label)+'">' +
+        '<span class="move"><button type="button" class="icon-btn" data-act="up" data-pid="'+p.id+'" '+(i===0?'disabled':'')+' aria-label="Move paragraph up">↑</button>' +
+        '<button type="button" class="icon-btn" data-act="down" data-pid="'+p.id+'" '+(i===n-1?'disabled':'')+' aria-label="Move paragraph down">↓</button></span></div>' +
+      rfield('topic',p,'Topic sentence') +
+      '<span class="field-label">Chunks and links</span>' + chunkEditor(p) +
+      rfield('synthesis',p,'Your synthesis') +
+    '</article></li>').join('') + '</ol>' +
+    '<div class="panel morphable"><label class="field-label" for="rv-conclusion">Where your review lands</label>' +
+      '<textarea id="rv-conclusion" rows="3" data-global="conclusion" data-track="conclusion">'+esc(state.conclusion)+'</textarea></div>' +
+    '<div class="panel morphable"><h2 class="panel-title">References ('+esc((STYLES[state.citationStyle]||{short:''}).short)+')</h2>' +
+      '<p class="note">Built from your source cards. Check each entry against the style, especially the title, and fix it here.</p>' +
+      '<ul class="ref-list">' + usedSources().map(s=>'<li><div class="ic-cite" id="ic-'+s.id+'">'+citeBlock(s)+'</div>'+editDetails(s, false)+'</li>').join('') + '</ul></div>' +
+    '<div class="map-bar"><p class="count" id="rv-status" aria-live="polite">'+esc(reviewStatus())+'</p>' +
+    '<div class="actions"><button class="secondary morphable" type="button" data-act="back-map">Regroup on the source map</button>' +
+    '<button class="secondary morphable" type="button" data-act="copy-outline">Copy outline as text</button>' +
+    '<button class="primary morphable" type="button" data-act="save-revision">Save this version</button></div></div></section>';
+}
+
+function afterRender(){
+  main.querySelectorAll('[data-prompt]').forEach(async el => {
+    const p = el.dataset.pid ? findP(el.dataset.pid) : null;
+    const stage = el.dataset.prompt;
+    const text = await ai('nextStepPrompt', {stage, paragraph:p}, 'np|'+stage+'|'+(el.dataset.pid||'')+'|'+(p?p.label:''));
+    if(el.isConnected) el.placeholder = text;
+  });
+  if(state.stage==='map'){
+    applyZoom(state.canvas.zoom == null ? fitZoom(true) : state.canvas.zoom);
+    renderBoard();
+  }
+  if(['topics','chunks','synthesis'].includes(state.stage)){
+    const first = main.querySelector('.panel.current textarea');
+    if(first) first.focus({preventScroll:true});
+  }
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+function movePara(pid, dir){
+  const ps = state.paragraphs, i = ps.findIndex(p=>p.id===pid), j = i + dir;
+  if(i<0 || j<0 || j>=ps.length) return;
+  const tmp = ps[i]; ps[i] = ps[j]; ps[j] = tmp;
+  const lo = Math.min(i,j), hi = Math.max(i,j); let cleared = 0;
+  [lo, hi, hi+1].forEach(k=>{ const q = ps[k]; if(q && q.link){ q.link = ''; cleared++; } });
+  Logger.log('reorder', {pid, from:i, to:j, linksCleared:cleared});
+  save(); render();
+  if(cleared) cue('Moved. Name the links around this paragraph again.');
+  const btn = main.querySelector('[data-act="'+(dir<0?'up':'down')+'"][data-pid="'+pid+'"]');
+  if(btn && !btn.disabled) btn.focus();
+}
+function usedSources(){
+  const ids = new Set(); state.paragraphs.forEach(p=>p.points.forEach(pt=>pt.cards.forEach(c=>ids.add(c.source))));
+  const list = state.sources.filter(s=>ids.has(s.id));
+  return (list.length ? list : state.sources.filter(s=>hlLines(s).length)).slice().sort((a,b)=>sortKey(a) < sortKey(b) ? -1 : 1);
+}
+function outlineText(){
+  const ps = state.paragraphs;
+  const parts = ['Purpose: ' + state.purpose, 'Citation style: ' + ((STYLES[state.citationStyle]||{}).name || '—'), ''];
+  ps.forEach((p,i)=>{
+    parts.push((i+1)+'. '+p.label, '   Topic sentence: '+p.topic);
+    p.points.forEach((pt,k)=>{
+      const srcs = Array.from(new Set(pt.cards.map(c=>stripParens(citeOf(c.source))))).join('; ');
+      const meta = [k > 0 && pt.link ? relName(pt.link) : '', purposeLabel(pt)].filter(Boolean).join(' · ');
+      parts.push('   '+(i+1)+'.'+(k+1)+' '+(meta ? '['+meta+'] ' : '')+pt.text+(srcs ? ' ('+srcs+')' : ''));
+    });
+    if(p.synthesis) parts.push('   Synthesis: '+p.synthesis);
+    if(i<ps.length-1 && ps[i+1].link) parts.push('   → Paragraph '+(i+2)+': '+relName(ps[i+1].link));
+    parts.push('');
+  });
+  if(state.conclusion) parts.push('Where the review lands: '+state.conclusion);
+  parts.push('', 'References');
+  usedSources().forEach(s=>parts.push(refPlain(s)));
+  return parts.join('\n');
+}
+async function addBubbles(text, kind){
+  const list = await ai('splitStatements', {text});
+  for(const t of list){
+    const s = freeSlot('bubble'); const id = uid();
+    items().push({id, kind:'bubble', text:t, x:s.x, y:s.y, zone:'work'}); freshBubbles.push(id);
+  }
+  Logger.log('add_bubble', {via:kind, n:list.length});
+  save(); renderBoard(); revealNewest();
+  return list.length;
+}
+function startEdit(bid){
+  const p = main.querySelector('.btext[data-bid="'+bid+'"]'); if(!p) return;
+  p.textContent = itemById(bid).text;
+  p.contentEditable = 'true'; p.focus();
+  const sel = window.getSelection(), range = document.createRange();
+  range.selectNodeContents(p); range.collapse(false); sel.removeAllRanges(); sel.addRange(range);
+  p.addEventListener('blur', () => {
+    const b = itemById(bid); if(!b) return;
+    const t = p.innerText.trim();
+    if(t && t !== b.text){ b.text = t; Logger.log('edit_bubble', {id:bid}); save(); }
+    renderBoard();
+  }, {once:true});
+  p.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); p.blur(); } if(e.key==='Escape'){ p.textContent = itemById(bid).text; p.blur(); } });
+}
+/* Filing: the drawer pulls out, the finished paragraph shrinks into a folder,
+   lifts over the drawer and slides in behind its front. Returns the duration. */
+function fileAway(panel){
+  if(!panel || reduceMotion() || !panel.animate) return 0;
+  const cab = main.querySelector('.cabinet'), drawer = cab && cab.querySelector('.drawer');
+  if(!drawer) return 0;
+  cab.classList.add('open');
+  panel.classList.add('filing');
+  setTimeout(()=>{
+    const a = panel.getBoundingClientRect(), t = drawer.getBoundingClientRect();
+    const sx = (t.width - 16) / a.width, sy = 46 / a.height;
+    const dx = t.left + 8 - a.left, dy = t.top - 50 - a.top;
+    panel.style.transformOrigin = '0 0';
+    panel.animate([
+      {transform:'none', opacity:1},
+      {transform:'translate('+(dx*0.6)+'px,'+(dy*0.6 - 30)+'px) scale('+(1 - (1 - sx)*0.6)+','+(1 - (1 - sy)*0.6)+')', opacity:1, offset:.55},
+      {transform:'translate('+dx+'px,'+dy+'px) scale('+sx+','+sy+')', opacity:1, offset:.8},
+      {transform:'translate('+dx+'px,'+(dy + 70)+'px) scale('+sx+','+sy+')', opacity:.85}
+    ], {duration:600, easing:'cubic-bezier(.45,0,.2,1)', fill:'forwards'});
+  }, 200);
+  return 820;
+}
+/* A highlighter stroke is written under the button label before the action runs. */
+function scribble(btn){
+  const w = btn.offsetWidth * 0.82, ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'scribble'); svg.setAttribute('viewBox', '0 0 '+w+' 10'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true');
+  const j = () => (Math.random()*2 - 1).toFixed(1);
+  const d = 'M2 '+(6+ +j())+' C'+(w*0.25)+' '+(3+ +j())+' '+(w*0.45)+' '+(8+ +j())+' '+(w*0.62)+' '+(5+ +j())+' S'+(w*0.9)+' '+(3+ +j())+' '+(w-2)+' '+(6+ +j());
+  const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); svg.appendChild(p); btn.appendChild(svg);
+  p.style.setProperty('--L', Math.ceil(p.getTotalLength ? p.getTotalLength() : w + 20));
+}
+const actions = {
+  'to-sources'(){
+    if(!state.purpose.trim() || !state.citationStyle) return;
+    seedSources();
+    snapshot('purpose'); go('sources');
+  },
+  'to-map'(){
+    if(!sourceCount().n) return;
+    const r = syncCards();
+    seedExample();
+    snapshot('sources');
+    go('map');
+    if(r.total) cue('You brought in '+r.total+' highlights from '+sourceCount().s+' sources.', true);
+  },
+  async 'add-ref'(b){
+    const ta = $('#ref-paste'); const text = ta ? ta.value.trim() : '';
+    if(!text){ cue('Paste a reference first.'); if(ta) ta.focus(); return; }
+    b.disabled = true;
+    const f = await ai('parseReference', {text});
+    const s = blankSource(f || {});
+    state.sources.push(s); clearExample();
+    Logger.log('source_added', {via:'paste', parsed:!!f}); save(); render();
+    const el = $(f ? '#hl-'+s.id : '#sf-authors-'+s.id); if(el){ el.scrollIntoView({block:'center'}); el.focus(); }
+    cue(f ? 'Card made. Check the details, then add what you highlighted.' : 'This reference could not be read. A blank card was added; fill in its details.');
+  },
+  'add-blank'(){
+    const s = blankSource(); state.sources.push(s); clearExample();
+    Logger.log('source_added', {via:'blank'}); save(); render();
+    const el = $('#sf-authors-'+s.id); if(el){ el.scrollIntoView({block:'center'}); el.focus(); }
+  },
+  'rm-source'(b){
+    if(!b.dataset.armed){ b.dataset.armed = '1'; b.textContent = 'Click again to remove'; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent = 'Remove this source'; } }, 3500); return; }
+    state.sources = state.sources.filter(s=>s.id !== b.dataset.ref);
+    Logger.log('source_removed', {}); save(); render();
+  },
+  'live-toggle'(){ if(liveOn) stopLive(); else startLive(); },
+  'sample-talk'(){ playSampleTalk(); },
+  async 'add-bubbles'(){
+    const ta = $('#talk-text'); const text = ta ? ta.value.trim() : '';
+    if(!text){ cue('Say something first. A few words in any language are enough.'); if(ta) ta.focus(); return; }
+    const n = await addBubbles(text, 'typed');
+    if(ta){ ta.value = ''; ta.focus(); }
+    cue(n === 1 ? 'Added a bubble. Drag it onto the cards that support it.' : 'Added '+n+' bubbles.');
+  },
+  'copy-card'(b){
+    const c = itemById(b.dataset.ref); if(!c) return;
+    items().push({id:uid(), kind:'card', source:c.source, text:c.text, x:clamp(c.x+18,0,BW-CARD_W), y:clamp(c.y+18,0,BH-CARD_H), zone:c.zone, under:null, copyOf:c.copyOf || c.id});
+    Logger.log('copy_card', {id:c.id}); save(); renderBoard();
+  },
+  'edit-bubble'(b){ startEdit(b.dataset.ref); },
+  'rm-bubble'(b){
+    const bub = itemById(b.dataset.ref); if(!bub) return;
+    cardsUnder(bub.id).forEach((c,k)=>{ c.under = null; c.x = clamp(bub.x + 16 + k*16, 0, BW-CARD_W); c.y = clamp(bub.y + 70 + k*16, 0, BH-CARD_H); c.zone = bub.zone; });
+    state.canvas.items = items().filter(i=>i.id!==bub.id);
+    Logger.log('remove_bubble', {id:bub.id}); save(); renderBoard();
+  },
+  'map-done'(){
+    const groups = stackGroups();
+    const unnamed = groups.findIndex(g=>!groupName(g));
+    if(unnamed >= 0){
+      const inp = $('#hn-'+unnamed);
+      if(inp){ inp.scrollIntoView({block:'center', inline:'center'}); inp.focus(); }
+      cue('Give each framed block a name first. Each block becomes a paragraph.');
+      return;
+    }
+    buildParagraphs();
+    snapshot('map');
+    go('topics');
+    cue('You named '+state.paragraphs.length+' themes. Each one becomes a paragraph.', true);
+  },
+  'back-map'(){ go('map'); },
+  'focus-next'(b){
+    const mode = b.dataset.mode, i = state.cursor, last = i >= state.paragraphs.length-1;
+    const panel = b.closest('.panel');
+    Logger.log('paragraph_done', {mode, pid:state.paragraphs[i].id});
+    snapshot(mode + ':' + state.paragraphs[i].id);
+    const ms = fileAway(panel);
+    setTimeout(()=>{
+      if(!last){ state.cursor++; justFiled = true; save(); render(); return; }
+      if(mode==='topics'){ go('chunks'); cue('Every theme has a topic sentence now.', true); }
+      else if(mode==='chunks'){ go('synthesis'); cue('Every paragraph has its structure set.', true); }
+      else { justRevealed = true; go('logic'); cue('Every paragraph ends with your synthesis. Here is your whole outline.', true); }
+    }, ms);
+  },
+  up(b){ movePara(b.dataset.pid, -1); },
+  'chunk-move'(b){
+    const p = findP(b.dataset.pid); if(!p) return;
+    const dir = +b.dataset.dir, bid = b.dataset.ref, i = p.points.findIndex(x=>x.bubbleId===bid), j = i + dir;
+    if(i < 0 || j < 0 || j >= p.points.length) return;
+    const tmp = p.points[i]; p.points[i] = p.points[j]; p.points[j] = tmp;
+    /* Links describe the relation to the chunk above, so the links around the moved chunks no longer hold. */
+    const lo = Math.min(i,j), hi = Math.max(i,j); let cleared = 0;
+    [lo, hi, hi+1].forEach(k=>{ const q = p.points[k]; if(q && q.link){ q.link = ''; cleared++; } });
+    Logger.log('chunk_reorder', {pid:p.id, from:i, to:j, linksCleared:cleared});
+    save(); render();
+    let nb = main.querySelector('[data-act="chunk-move"][data-ref="'+bid+'"][data-dir="'+dir+'"]');
+    if(!nb || nb.disabled) nb = main.querySelector('[data-act="chunk-move"][data-ref="'+bid+'"]:not([disabled])');
+    if(nb) nb.focus();
+    if(cleared) cue('Moved. Name the links around this chunk again.');
+  },
+  down(b){ movePara(b.dataset.pid, 1); },
+  'to-review'(){ snapshot('logic'); openFlag = null; go('review'); },
+  'flag-open'(b){
+    openFlag = b.dataset.key; render();
+    const t = $('#flag-note'); if(t) t.focus();
+  },
+  'flag-cancel'(){ openFlag = null; render(); },
+  'flag-save'(b){
+    const ta = $('#flag-note'), note = ta ? ta.value.trim() : '';
+    if(!note){ const er = $('#flag-err'); if(er) er.hidden = false; if(ta) ta.focus(); return; }
+    const k = main.querySelector('input[name="fk"]:checked'), key = b.dataset.key;
+    const f = {id:uid(), key, kind:k ? k.value : 'unsure', note, t:Date.now(), trace:{decision:'', why:''}};
+    rv().flags.push(f);
+    Logger.log('review_flag', {key, kind:f.kind, noteLength:note.length});
+    openFlag = null; save(); render();
+    cue('Marked. Trace it back in step 2.');
+  },
+  'flag-rm'(b){
+    rv().flags = rv().flags.filter(f=>f.id !== b.dataset.ref);
+    Logger.log('review_flag_removed', {}); save(); render();
+  },
+  'copy-outline'(){ copyText(outlineText(), 'Outline copied.'); Logger.log('copy_outline', {}); },
+  'to-revise'(){ go('revise'); },
+  'save-revision'(){
+    snapshot('revision');
+    const R = rv();
+    Logger.log('review_saved', {flags:R.flags.length, traced:R.flags.filter(f=>f.trace && f.trace.decision).length,
+      globals:GLOBALS.map(g=>({id:g.id, choice:(R.globals[g.id]||{}).choice || ''}))});
+    cue('Saved as version ' + state.versions.length + '.');
+  }
+};
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+main.addEventListener('click', e => {
+  if(morphing) return;
+  if(e.target.id === 'hint-toggle'){
+    if(e.target.disabled) return;
+    state.canvas.hintsOn = !state.canvas.hintsOn;
+    e.target.setAttribute('aria-pressed', state.canvas.hintsOn ? 'true' : 'false');
+    Logger.log('hints', {on:state.canvas.hintsOn}); save(); drawHints(); return;
+  }
+  const zb = e.target.closest('[data-zoom]');
+  if(zb){
+    const k = zb.dataset.zoom;
+    applyZoom(k === 'fit' ? fitZoom() : zoom() * (k === 'in' ? 1.2 : 1/1.2));
+    Logger.log('zoom', {to:zoom()}); return;
+  }
+  const b = e.target.closest('[data-act]'); if(!b || b.disabled || b.dataset.writing) return;
+  const fn = actions[b.dataset.act]; if(!fn) return;
+  if(b.classList.contains('primary') && b.dataset.act !== 'live-toggle' && document.body.dataset.phase !== 'final' && !reduceMotion()){
+    b.dataset.writing = '1'; scribble(b);
+    setTimeout(()=>{ delete b.dataset.writing; if(b.isConnected) fn(b, e); }, 380);
+    return;
+  }
+  fn(b, e);
+});
+main.addEventListener('dblclick', e => {
+  const t = e.target.closest('.btext'); if(t && t.contentEditable !== 'true') startEdit(t.dataset.bid);
+});
+main.addEventListener('wheel', e => {
+  if(!(e.ctrlKey || e.metaKey) || !e.target.closest('#board-wrap')) return;
+  e.preventDefault();
+  applyZoom(zoom() * (e.deltaY < 0 ? 1.08 : 1/1.08));
+}, {passive:false});
+main.addEventListener('input', e => {
+  const el = e.target;
+  if(el.id === 'purpose-text'){
+    state.purpose = el.value; clearExample(); save();
+    const b = main.querySelector('[data-act="to-sources"]'); if(b) b.disabled = !(el.value.trim() && state.citationStyle); return;
+  }
+  if(el.dataset.sfield){
+    const src = sourceById(el.dataset.sid); if(!src) return;
+    const f = el.dataset.sfield;
+    if(f === 'authors') src.authors = el.value.split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>{ const k = l.indexOf(','); return k < 0 ? {last:l, given:''} : {last:l.slice(0,k).trim(), given:l.slice(k+1).trim()}; });
+    else src[f] = el.value;
+    clearExample(); save();
+    const box = $('#ic-'+src.id); if(box) box.innerHTML = citeBlock(src);
+    const n = hlLines(src).length, hc = $('#hlc-'+src.id); if(hc) hc.textContent = n+' highlight'+(n===1?'':'s');
+    const cnt = $('#source-count'); if(cnt) cnt.textContent = countText();
+    const b = main.querySelector('[data-act="to-map"]'); if(b) b.disabled = !sourceCount().n;
+    return;
+  }
+  if(el.id === 'talk-text'){ noteMentions(el.value, 'typed'); }
+  if(el.dataset.themeIds){
+    for(const id of el.dataset.themeIds.split(',')){ const bub = itemById(id); if(bub) bub.theme = el.value; }
+    save(); return;
+  }
+  if(el.id === 'flag-note'){ const er = $('#flag-err'); if(er) er.hidden = true; return; }
+  if(el.dataset.tracewhy){
+    const f = rv().flags.find(x=>x.id===el.dataset.tracewhy); if(f){ f.trace = Object.assign({decision:'', why:''}, f.trace, {why:el.value}); save(); }
+    return;
+  }
+  if(el.dataset.globalWhy){
+    const id = el.dataset.globalWhy, G = rv().globals;
+    G[id] = Object.assign({}, G[id] || {}, {why:el.value}); save(); updateGlobal(id); return;
+  }
+  if(el.dataset.global){ state[el.dataset.global] = el.value; save(); return; }
+  if(el.dataset.cnote){
+    const parts = el.dataset.cnote.split('|'), p = findP(parts[0]); if(!p) return;
+    const pt = p.points.find(x=>x.bubbleId===parts[1]); if(pt) pt.purposeNote = el.value;
+    save(); refreshNext(); updateChunkStatus(p); return;
+  }
+  if(el.dataset.bind){
+    const p = findP(el.dataset.pid); if(!p) return;
+    p[el.dataset.bind] = el.value;
+    if(el.dataset.bind === 'label') p.points.forEach(pt=>{ const bub = itemById(pt.bubbleId); if(bub) bub.theme = el.value; });
+    save(); refreshNext();
+  }
+});
+function clearExample(){ if(state.isExample){ state.isExample = false; main.querySelectorAll('.example-flag').forEach(f=>f.remove()); } }
+function refreshNext(){
+  const b = main.querySelector('[data-act="focus-next"]');
+  if(b) b.disabled = !focusReady(b.dataset.mode, state.paragraphs[Math.min(state.cursor, state.paragraphs.length-1)]);
+}
+main.addEventListener('change', async e => {
+  const el = e.target;
+  if(el.id === 'talk-file' && el.files.length){
+    const text = await Transcriber.transcribe(el.files[0]);
+    const n = await addBubbles(text, 'recording');
+    el.value = '';
+    cue('Added '+n+' bubble'+(n===1?'':'s')+' from your recording. Edit them if the words came out wrong.');
+    return;
+  }
+  if(el.id === 'live-lang'){ state.canvas.liveLang = el.value; save(); if(liveOn){ stopLive(); startLive(); } return; }
+  if(el.name === 'cstyle'){
+    state.citationStyle = el.value; Logger.log('citation_style', {style:el.value}); save();
+    const b = main.querySelector('[data-act="to-sources"]'); if(b) b.disabled = !(state.purpose.trim() && state.citationStyle);
+    return;
+  }
+  if(el.dataset.trace){
+    const f = rv().flags.find(x=>x.id===el.dataset.trace); if(!f) return;
+    f.trace = Object.assign({decision:'', why:''}, f.trace, {decision:el.value});
+    Logger.log('review_trace', {flagKind:f.kind, decision:el.value, level:GLOBAL_DECISIONS.has(el.value) ? 'global' : (el.value === 'wording' ? 'wording' : (el.value === 'none' ? 'none' : 'local'))});
+    save(); updateReviewStatus(); return;
+  }
+  if(el.dataset.gchoice){
+    const id = el.dataset.gchoice, G = rv().globals;
+    G[id] = Object.assign({}, G[id] || {}, {choice:el.value});
+    Logger.log('global_decision', {id, choice:el.value});
+    save(); updateGlobal(id); return;
+  }
+  if(el.dataset.ck !== undefined){ state.checklist[el.dataset.ck] = el.checked; Logger.log('checklist', {item:+el.dataset.ck, checked:el.checked}); save(); return; }
+  if(el.dataset.plink){
+    const q = findP(el.dataset.plink); if(!q) return;
+    q.link = el.value; Logger.log('paragraph_link', {pid:q.id, relation:el.value});
+    const ph = $('#php-'+q.id); if(ph) ph.innerHTML = phrasesHTML(el.value);
+    save(); return;
+  }
+  if(el.dataset.cpurpose || el.dataset.clink){
+    const parts = (el.dataset.cpurpose || el.dataset.clink).split('|'), p = findP(parts[0]); if(!p) return;
+    const pt = p.points.find(x=>x.bubbleId===parts[1]); if(!pt) return;
+    if(el.dataset.cpurpose){ pt.purposeId = el.value; Logger.log('chunk_purpose', {pid:p.id, bubbleId:pt.bubbleId, purpose:el.value}); }
+    else {
+      pt.link = el.value; Logger.log('chunk_link', {pid:p.id, bubbleId:pt.bubbleId, relation:el.value});
+      const ph = $('#ph-'+pt.bubbleId); if(ph) ph.innerHTML = phrasesHTML(el.value);
+    }
+    save(); refreshNext(); updateChunkStatus(p); return;
+  }
+});
+/* Board drag (pointer events: mouse, pen, touch). All positions in board units. */
+let drag = null;
+function boardPoint(e){ const br = $('#board').getBoundingClientRect(), z = zoom(); return {x:(e.clientX - br.left)/z, y:(e.clientY - br.top)/z}; }
+main.addEventListener('pointerdown', e => {
+  if(e.button > 0) return;
+  const board = e.target.closest('#board'); if(!board) return;
+  const grip = e.target.closest('[data-theme-grip]');
+  if(grip){
+    const ids = grip.dataset.themeGrip.split(',');
+    drag = {block:true, ids, sx:e.clientX, sy:e.clientY, started:false,
+      starts: ids.map(id=>{ const it = itemById(id), el = board.querySelector('.item[data-id="'+id+'"]'); return {id, x:it.x, y:it.y, w:el.offsetWidth, h:el.offsetHeight, el}; })};
+    return;
+  }
+  if(e.target.closest('button, input, [contenteditable="true"]')) return;
+  const chip = e.target.closest('[data-card-chip]');
+  const el = e.target.closest('.item');
+  if(!chip && !el) return;
+  drag = {chipId: chip ? chip.dataset.cardChip : null, id: chip ? null : el.dataset.id, sx:e.clientX, sy:e.clientY, started:false};
+  if(!chip){
+    const it = itemById(drag.id), p = boardPoint(e);
+    drag.ox = p.x - it.x; drag.oy = p.y - it.y;
+    drag.fromZone = it.zone;
+  }
+});
+/* Magnetic stacking: within SNAP_R a drop target pulls the dragged item toward it. */
+function rectDist(p, r){ const dx = Math.max(r.x - p.x, 0, p.x - (r.x + r.w)), dy = Math.max(r.y - p.y, 0, p.y - (r.y + r.h)); return Math.hypot(dx, dy); }
+function anchorOf(it, el, x, y){
+  if(it.kind === 'bubble'){ const b = el.querySelector('.bubble'); return {x:x + b.offsetLeft + b.offsetWidth/2, y:y + b.offsetTop + b.offsetHeight/2}; }
+  return {x:x + el.offsetWidth/2, y:y + el.offsetHeight/2};
+}
+function nearTarget(it, el, x, y){
+  const board = $('#board'), p = anchorOf(it, el, x, y);
+  let best = null;
+  if(it.kind === 'bubble'){
+    board.querySelectorAll('.item.card').forEach(c=>{
+      const ci = itemById(c.dataset.id); if(!ci) return;
+      const r = {x:ci.x, y:ci.y, w:c.offsetWidth, h:c.offsetHeight}, d = rectDist(p, r);
+      if(d < SNAP_R && (!best || d < best.d)) best = {el:c, mark:c, id:c.dataset.id, r, d};
+    });
+  } else {
+    board.querySelectorAll('.item.stack').forEach(s=>{
+      if(s === el) return;
+      const si = itemById(s.dataset.id); if(!si) return;
+      const b = s.querySelector('.bubble');
+      const r = {x:si.x + b.offsetLeft, y:si.y + b.offsetTop, w:b.offsetWidth, h:b.offsetHeight}, d = rectDist(p, r);
+      if(d < SNAP_R && (!best || d < best.d)) best = {el:s, mark:s, id:s.dataset.id, r, d};
+    });
+  }
+  if(best){ best.p = p; }
+  return best;
+}
+window.addEventListener('pointermove', e => {
+  if(!drag) return;
+  const board = $('#board'); if(!board){ drag = null; return; }
+  const z = zoom();
+  if(drag.block){
+    if(!drag.started){
+      if(Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 5) return;
+      drag.started = true;
+      const hull = board.querySelector('[data-hull="'+drag.ids.join(',')+'"]'); if(hull) hull.classList.add('moving');
+      drag.starts.forEach(s=>s.el.classList.add('dragging'));
+    }
+    e.preventDefault();
+    let dx = (e.clientX - drag.sx)/z, dy = (e.clientY - drag.sy)/z;
+    for(const s of drag.starts){ dx = clamp(dx, -s.x, BW - s.w - s.x); dy = clamp(dy, -s.y, BH - s.h - s.y); }
+    drag.dx = dx; drag.dy = dy;
+    drag.starts.forEach(s=>{ s.el.style.left = (s.x + dx) + 'px'; s.el.style.top = (s.y + dy) + 'px'; });
+    return;
+  }
+  if(!drag.started){
+    if(Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 5) return;
+    drag.started = true;
+    if(drag.chipId){
+      const c = itemById(drag.chipId); if(!c){ drag = null; return; }
+      drag.fromBubble = c.under; c.under = null; drag.id = c.id; drag.ox = 100; drag.oy = 20; drag.fromZone = 'stack';
+      Logger.log('unstack', {cardId:c.id, bubbleId:drag.fromBubble});
+      renderBoard();
+    }
+    drag.el = board.querySelector('.item[data-id="'+drag.id+'"]');
+    if(!drag.el){ drag = null; return; }
+    drag.el.classList.add('dragging');
+  }
+  e.preventDefault();
+  const it = itemById(drag.id), p = boardPoint(e);
+  const w = drag.el.offsetWidth, h = drag.el.offsetHeight;
+  let x = clamp(p.x - drag.ox, 0, BW - w), y = clamp(p.y - drag.oy, 0, BH - h);
+  board.querySelectorAll('.near').forEach(n=>n.classList.remove('near'));
+  const t = nearTarget(it, drag.el, x, y);
+  if(t){
+    t.mark.classList.add('near');
+    const pull = (1 - t.d / SNAP_R) * 0.6, cx = t.r.x + t.r.w/2, cy = t.r.y + t.r.h/2;
+    x = clamp(x + (cx - t.p.x) * pull, 0, BW - w); y = clamp(y + (cy - t.p.y) * pull, 0, BH - h);
+  }
+  drag.target = t;
+  drag.x = x; drag.y = y;
+  drag.el.style.left = x + 'px'; drag.el.style.top = y + 'px';
+}, {passive:false});
+function centerOf(r){ return {x:r.x + r.w/2, y:r.y + r.h/2}; }
+function endDrag(){
+  if(!drag) return;
+  const d = drag; drag = null;
+  if(!d.started) return;
+  if(d.block){
+    for(const s of d.starts){
+      const it = itemById(s.id); if(!it) continue;
+      it.x = s.x + d.dx; it.y = s.y + d.dy;
+      const c = centerOf(relRect(s.el.querySelector('.bubble')));
+      it.zone = zoneOf(c.x, c.y);
+    }
+    Logger.log('move_block', {n:d.ids.length, dx:Math.round(d.dx), dy:Math.round(d.dy)});
+    save(); renderBoard(); return;
+  }
+  const it = itemById(d.id); if(!it){ renderBoard(); return; }
+  it.x = d.x; it.y = d.y;
+  const c = anchorOf(it, d.el, d.x, d.y);
+  it.zone = zoneOf(c.x, c.y);
+  const target = d.target;
+  if(target){
+    const bubbleId = it.kind === 'bubble' ? it.id : target.id;
+    const cardId = it.kind === 'bubble' ? target.id : it.id;
+    const card = itemById(cardId); card.under = bubbleId;
+    lastSnap = {bubbleId, cardId};
+    const viaHint = currentHints.some(h=>h.cardId===cardId && h.bubbleId===bubbleId);
+    Logger.log('stack', {bubbleId, cardId, viaHint});
+    if(!items().some(i=>i.kind==='card' && i.under && i.id!==cardId)) cue('Stacked. Keep stacks that belong together close.');
+  }
+  Logger.log('canvas_move', {id:it.id, kind:it.kind, fromZone:d.fromZone, zone:it.zone, x:Math.round(it.x), y:Math.round(it.y)});
+  save(); renderBoard();
+}
+window.addEventListener('pointerup', endDrag);
+window.addEventListener('pointercancel', endDrag);
+
+/* Write-forward tracking: characters added vs deleted per focus session */
+let typing = null;
+main.addEventListener('focusin', e => {
+  const el = e.target.closest('[data-track]');
+  typing = el ? {field:el.dataset.track, pid:el.dataset.pid || null, added:0, deleted:0, start:Date.now()} : null;
+});
+main.addEventListener('beforeinput', e => {
+  if(!typing) return;
+  const el = e.target;
+  if(e.inputType.startsWith('delete')){
+    const sel = (el.selectionEnd || 0) - (el.selectionStart || 0);
+    typing.deleted += Math.max(1, sel);
+  } else if(e.data){ typing.added += e.data.length; }
+  else if(e.dataTransfer){ typing.added += (e.dataTransfer.getData('text') || '').length; }
+  else if(e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph'){ typing.added += 1; }
+});
+main.addEventListener('focusout', () => {
+  if(typing && (typing.added || typing.deleted)) Logger.log('typing', {field:typing.field, pid:typing.pid, added:typing.added, deleted:typing.deleted, ms:Date.now()-typing.start});
+  typing = null;
+});
+
+/* Hold to peek */
+let peekStart = 0;
+function peekOn(e){ if(!e.target.closest('[data-peek]')) return; main.classList.add('peeking'); peekStart = Date.now(); }
+function peekOff(){ if(!peekStart) return; main.classList.remove('peeking'); Logger.log('peek', {ms:Date.now()-peekStart}); peekStart = 0; }
+main.addEventListener('pointerdown', peekOn);
+['pointerup','pointercancel','pointerleave'].forEach(t=>main.addEventListener(t, peekOff));
+main.addEventListener('keydown', e => { if((e.key===' '||e.key==='Enter') && e.target.closest('[data-peek]') && !peekStart){ e.preventDefault(); peekOn(e); } });
+main.addEventListener('keyup', e => { if((e.key===' '||e.key==='Enter') && e.target.closest('[data-peek]')) peekOff(); });
+
+/* =========================================================
+   SESSION LOG (research view)
+   ========================================================= */
+function metrics(){
+  const typingEv = state.log.filter(e=>e.type==='typing');
+  const added = typingEv.reduce((a,e)=>a+e.added,0), deleted = typingEv.reduce((a,e)=>a+e.deleted,0);
+  const R = state.review || {flags:[], globals:{}};
+  const byKind = {}; FLAG_KINDS.forEach(k=>byKind[k.id]=0); R.flags.forEach(f=>byKind[f.kind]=(byKind[f.kind]||0)+1);
+  const traceLevel = {global:0, local:0, wording:0, none:0};
+  R.flags.forEach(f=>{ const d = f.trace && f.trace.decision; if(!d) return; const lv = GLOBAL_DECISIONS.has(d) ? 'global' : (d === 'wording' || d === 'none' ? d : 'local'); traceLevel[lv]++; });
+  const revEv = state.log.filter(e=>e.stage==='review');
+  const revStructure = revEv.filter(e=>['chunk_purpose','chunk_link','chunk_reorder','paragraph_link','reorder'].includes(e.type)).length;
+  const revWording = revEv.filter(e=>e.type==='typing' && ['topic','synthesis','label','conclusion','chunk-note'].includes(e.field)).length;
+  const globalChoices = GLOBALS.map(g=>g.name+': '+((R.globals[g.id]||{}).choice || '—'));
+  const bubbles = items().filter(i=>i.kind==='bubble');
+  const stacked = bubbles.map(b=>cardsUnder(b.id)).filter(a=>a.length);
+  const srcPer = stacked.length ? (stacked.reduce((a,cs)=>a+new Set(cs.map(c=>c.source)).size,0)/stacked.length).toFixed(2) : '—';
+  const pts = state.paragraphs.flatMap(p=>p.points);
+  const byRel = {}, paraRel = {}; RELATIONS.forEach(r=>{ byRel[r.id]=0; paraRel[r.id]=0; });
+  pts.forEach(pt=>{ if(pt.link) byRel[pt.link] = (byRel[pt.link]||0) + 1; });
+  state.paragraphs.slice(1).forEach(q=>{ if(q.link) paraRel[q.link] = (paraRel[q.link]||0) + 1; });
+  return {
+    paraRel, chunks:pts.length, purposed:pts.filter(hasPurpose).length, ownWords:pts.filter(pt=>String(pt.purposeNote||'').trim()).length, byRel,
+    added, delRate: added ? (deleted/added*100).toFixed(1) : '0.0',
+    peeks: state.log.filter(e=>e.type==='peek').length,
+    versions: state.versions.length,
+    moves: state.log.filter(e=>e.type==='canvas_move').length,
+    stacks: state.log.filter(e=>e.type==='stack').length,
+    srcPer,
+    aside: items().filter(i=>i.zone==='archive' && !(i.kind==='card' && i.under)).length,
+    unsure: items().filter(i=>i.zone==='unsure' && !(i.kind==='card' && i.under)).length,
+    hintFollows: state.log.filter(e=>e.type==='stack' && e.viaHint).length,
+    flags:R.flags.length, byKind, traceLevel, revStructure, revWording, globalChoices
+  };
+}
+function jumpTo(stage){
+  if(stageIndex(stage) >= stageIndex('sources')){ if(!state.citationStyle) state.citationStyle = 'apa'; seedSources(); }
+  if(stageIndex(stage) >= stageIndex('map')){ syncCards(); seedExample(); }
+  if(stageIndex(stage) > stageIndex('map') && !state.paragraphs.length) return;
+  Logger.log('preview_jump', {to:stage});
+  logPanel.hidden = true;
+  go(stage);
+}
+/* Example walkthrough: fills every screen. full = also decision marks, an explanation and zones on the map. */
+function buildSample(full){
+  if(!state.citationStyle) state.citationStyle = 'apa';
+  if(!state.sources.length){ state.isExample = true; state.sourcesSeeded = false; }
+  seedSources(); syncCards(); state.canvas.seeded = true;
+  const card = t => items().find(i=>i.kind==='card' && i.text.indexOf(t) === 0);
+  const place = (t, x, y, zone) => { const c = card(t); if(c){ c.x = x; c.y = y; c.zone = zone; c.under = null; } };
+  const bubble = (t, x, y) => { let b = items().find(i=>i.kind==='bubble' && i.text.indexOf(t) === 0);
+    if(!b){ b = {id:uid(), kind:'bubble', text:t, x, y, zone:'work'}; items().push(b); } b.x = x; b.y = y; b.zone = 'work'; return b; };
+  const b1 = bubble(BN.notOnlyGrammar, 70, 120);
+  const b2 = bubble('Students and faculty look at different levels', 336, 120);
+  const b3 = bubble('Students get little explicit writing instruction', 602, 120);
+  const b4 = bubble(BN.noOneExplains, 70, 470);
+  const b5 = bubble('What students learned at home does not match', 336, 470);
+  [[b1,'Supervisors report problems'],[b1,'Students struggle'],[b2,'Students worry most'],[b3,'EAL doctoral'],[b4,'Success depends'],[b5,'Home literacy']]
+    .forEach(([b,t])=>{ const c = card(t); if(c) c.under = b.id; });
+  if(full){
+    place('Supervisors also see', UNSURE_X + 30, 60, 'unsure');
+    place('Some student strategies', UNSURE_X + 30, 220, 'unsure');
+    place('Methodology and discussion', 420, ARCHIVE_Y + 18, 'archive');
+  }
+  b1.theme = b2.theme = b3.theme = 'Language and structure'; b4.theme = b5.theme = 'Unspoken expectations';
+  const pt = (b, purposeId, link, purposeNote) => ({bubbleId:b.id, text:b.text, cards:cardsUnder(b.id).map(c=>({id:c.id, source:c.source, text:c.text})),
+    purposeId, purposeNote:purposeNote || '', link:link || ''});
+  const P1 = uid(), P2 = uid();
+  state.paragraphs = [
+    {id:P1, label:'Language and structure',
+     topic:'Graduate writers struggle with more than grammar: thesis structure and a lack of explicit instruction matter as much.',
+     points:[pt(b1,'common'), pt(b2,'different','contrast'), pt(b3,'gap','explain')],
+     synthesis:'Taken together, the difficulty lies less in grammar than in knowing what structure is expected, and students are rarely taught it.',
+     link:'', marks:[]},
+    {id:P2, label:'Unspoken expectations',
+     topic:'Graduate writing expectations are rarely made explicit to international students.',
+     points:[pt(b4,'common'), pt(b5,'evidence','explain','why expectations feel hidden')],
+     synthesis:'Expectations stay tacit, so students fall back on what worked at home; making them explicit is part of the support they need.',
+     link:'explain', marks:[]}
+  ];
+  state.conclusion = 'Few studies look at support during the writing process itself, between knowledge-focused workshops and feedback on finished drafts.';
+  /* A sample review: one mark traced to a decision, and one required decision discussed. */
+  state.review = full ? {
+    flags:[{id:uid(), key:'clink:'+P1+':'+b2.id, kind:'structure', note:BN.flagNote, t:Date.now(),
+            trace:{decision:'clink', why:'I picked Contrast because students and faculty look at different levels. Maybe it is one problem seen from two sides, so Extends could fit better.'}}],
+    globals:{landing:{choice:'keep', why:'It answers my purpose: support during the writing process is what is missing.'}}
+  } : {flags:[], globals:{}};
+  state.cursor = 0;
+}
+function loadSampleOutline(){
+  buildSample(false);
+  Logger.log('sample_outline', {}); save();
+  cue('Sample outline loaded. Pick a screen to preview.');
+}
+function exportData(){ return Object.assign({exportedAt:new Date().toISOString(), aiMode:CONFIG.aiMode}, state); }
+function renderLog(){
+  const m = metrics();
+  const metric = (label, v) => '<div class="metric"><b>'+esc(v)+'</b>'+label+'</div>';
+  logPanel.innerHTML =
+    '<div class="lp-head"><h2 class="panel-title">Session log</h2><button type="button" class="link-btn" id="lp-close">Close</button></div>' +
+    '<p class="note">For the research team. AI: '+(CONFIG.aiMode==='mock'?'built-in example logic, no model connected.':'connected model.')+'</p>' +
+    '<div class="panel"><label class="field-label" for="jump">Preview a screen</label>' +
+      '<div class="talk-row"><select id="jump" style="flex:1">' + STAGES.map(st=>{
+        const need = stageIndex(st.id) > stageIndex('map') && !state.paragraphs.length;
+        return '<option value="'+st.id+'"'+(st.id===state.stage?' selected':'')+(need?' disabled':'')+'>'+esc(st.name)+(need?' (needs an outline)':'')+'</option>';
+      }).join('') + '</select><button type="button" class="secondary" id="jump-go">Go</button></div>' +
+      (state.paragraphs.length ? '' : '<button type="button" class="ghost-btn" id="load-sample">Load a sample outline</button><p class="note">Fills the later screens with sample content so you can preview them.</p>') +
+      '<p class="note">For checking screens only. Jumps are logged.</p></div>' +
+    '<div class="metrics">' +
+      metric('Characters typed', m.added) + metric('Deletions per 100 typed', m.delRate) +
+      metric('Card moves on the map', m.moves) + metric('Stacking actions', m.stacks) +
+      metric('Sources per statement', m.srcPer) + metric('Hints followed', m.hintFollows) +
+      metric('Set aside / not sure', m.aside + ' / ' + m.unsure) + metric('Peeks', m.peeks) +
+      metric('Versions saved', m.versions) + metric('Review marks', m.flags) +
+      metric('Revisions in review: structure / wording', m.revStructure + ' / ' + m.revWording) +
+      metric('Chunks with a purpose', m.purposed + ' / ' + m.chunks) + metric('Purposes in own words', m.ownWords) +
+    '</div>' +
+    '<div><span class="mini">Links by relation: within paragraphs / between paragraphs</span>' + RELATIONS.map(r=>'<span class="pill alt" style="margin:2px 4px 2px 0;display:inline-block">'+esc(r.name)+': '+m.byRel[r.id]+' / '+m.paraRel[r.id]+'</span>').join('') + '</div>' +
+    '<div><span class="mini">Review marks by what felt off</span>' + FLAG_KINDS.map(k=>'<span class="pill alt" style="margin:2px 4px 2px 0;display:inline-block">'+esc(k.name)+': '+m.byKind[k.id]+'</span>').join('') + '</div>' +
+    '<div><span class="mini">Marks traced to decisions, by level</span>' + Object.keys(m.traceLevel).map(k=>'<span class="pill alt" style="margin:2px 4px 2px 0;display:inline-block">'+esc(k)+': '+m.traceLevel[k]+'</span>').join('') + '</div>' +
+    '<div><span class="mini">Required decisions</span>' + m.globalChoices.map(t=>'<span class="pill alt" style="margin:2px 4px 2px 0;display:inline-block">'+esc(t)+'</span>').join('') + '</div>' +
+    '<div><span class="mini">Latest events</span><pre class="ev">'+esc(state.log.slice(-40).map(e=>new Date(e.t).toLocaleTimeString()+'  '+e.stage+'  '+e.type).join('\n') || 'No events yet.')+'</pre></div>' +
+    '<label class="field-label" for="export-json">Session data (JSON)</label>' +
+    '<textarea id="export-json" class="json" readonly>'+esc(JSON.stringify(exportData(), null, 2))+'</textarea>' +
+    '<button type="button" class="secondary" id="copy-json">Copy session data</button>';
+}
+logPanel.addEventListener('click', e => {
+  if(e.target.id === 'lp-close'){ logPanel.hidden = true; $('#btn-log').focus(); }
+  if(e.target.id === 'jump-go'){ jumpTo($('#jump').value); return; }
+  if(e.target.id === 'load-sample'){ loadSampleOutline(); renderLog(); return; }
+  if(e.target.id === 'copy-json'){ copyText(JSON.stringify(exportData(), null, 2), 'Session data copied.', $('#export-json')); }
+});
+$('#btn-log').addEventListener('click', () => { logPanel.hidden = !logPanel.hidden; if(!logPanel.hidden){ renderLog(); $('#lp-close').focus(); } });
+let resetArmed = null;
+$('#btn-reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if(!resetArmed){
+    b.textContent = 'Click again to clear everything';
+    resetArmed = setTimeout(()=>{ b.textContent = 'Start over'; resetArmed = null; }, 3500);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = 'Start over';
+  state = blankState(); promptCache.clear(); mentioned.clear();
+  if(CONFIG.demo) buildSample(true);
+  try{ localStorage.removeItem(CONFIG.storageKey); }catch(err){}
+  logPanel.hidden = true; render(); window.scrollTo(0,0);
+});
+window.addEventListener('resize', ()=>{ if(state.stage === 'map'){ renderBoard(); } });
+
+if(CONFIG.demo && !saved){ buildSample(true); save(); }
+
+window.WriteFlow = {
+  CONFIG, Logger, MockAI, RemoteAI, STYLES, inText, refParts,
+  setAI(adapter){ AI = adapter; promptCache.clear(); },
+  getState(){ return state; }
+};
+
+render();
+})();
+</script>
+
+
+</body></html>
